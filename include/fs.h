@@ -47,7 +47,8 @@ struct super_block_t {
 	unsigned int	free_inode_num;				/* number of free inode */
 	unsigned int	free_inode_stack[NINODE];	/* stack of free inode */
 	unsigned short	free_inode_sp;				/* stack pointer */
-
+	char			modified;					/* whether ths sb has been
+												   modified */
 };
 
 /* file on the disk */
@@ -138,6 +139,8 @@ extern unsigned long map_addr(unsigned int);
 /* alloc.c */
 extern struct inode_t* ialloc(void);
 extern void ifree(unsigned int);
+extern unsigned int balloc(void);
+extern void bfree(unsigned int);
 
 /* iget.c */
 extern struct inode_t* iget(unsigned int);

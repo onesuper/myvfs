@@ -5,7 +5,7 @@ CC = gcc
 
 all: init/init.so fs/fs.so
 
-# init 
+# init ----------------------------------------------------- PART I
 
 init/init.so: init/init.o
 	$(CC) -o init/init.so -shared init/init.o 
@@ -13,12 +13,13 @@ init/init.so: init/init.o
 init/init.o: init/init.c
 	$(CC) -o init/init.o -c -fPIC init/init.c -I. -Wall
 
-# system calls in vfs
+# system calls in vfs ----------------------------------------- PART II
 
 CFLAGS = -c -fPIC -I. -Wall
 
 # add the objects here:
-OBJECTS = fs/util.o fs/mount.o fs/alloc.o fs/iget.o
+
+OBJECTS = fs/util.o fs/mount.o fs/alloc.o fs/iget.o fs/sys.o fs/namei.o
 
 # gather all the object file and generate a big
 # shared library
@@ -39,6 +40,12 @@ fs/alloc.o: fs/alloc.c
 
 fs/iget.o: fs/iget.c
 	$(CC) -o fs/iget.o $(CFLAGS) fs/iget.c
+
+fs/sys.o: fs/sys.c
+	$(CC) -o fs/sys.o $(CFLAGS) fs/sys.c
+
+fs/namei.o: fs/namei.c
+	$(CC) -o fs/namei.o $(CFLAGS) fs/namei.c
 
 clean:
 	rm -rf init/*.o

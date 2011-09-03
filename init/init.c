@@ -85,12 +85,13 @@ void format_fs(char* path, char* pwd) {
 
 	/* create super block at #1 */
 	struct super_block_t sb;
-	sb.data_block_num = NDBLOCK / 50 * 49;
+	sb.data_block_num = NDBLOCK / 50 * 49;  /* 1 is used to store bmap*/
 	sb.inode_block_num = NIBLOCK / 50 * 49;
 	sb.free_block_num = NDBLOCK / 50 * 49;
-	sb.free_block_sp = 0; /* the stack is empty */
+	sb.free_block_sp = 0;		/* the stack is empty */
 	sb.free_inode_num = NIBLOCK * SBLOCK / sizeof(dino);
 	sb.free_inode_sp = 0;
+	sb.modified = 0;
 	fseek(fd, SBLOCK * 1, 0);  
 	fwrite(&sb, 1, sizeof(sb), fd);
 

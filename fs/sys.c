@@ -11,6 +11,7 @@
 #include <include/fs.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 
@@ -86,6 +87,18 @@ void mkdir(const char* pathname) {
 		printf("File or directory exists");
 		return;
 	}
+	
+	/* make a new directory entry */
+	struct directory_t dir;
+
+	/* 
+	 * even a empty dir has a entry which
+	 * represents its upper layer dir, in this case
+	 * cur_dir
+	 */
+	dir.size = 1;
+	strcpy(dir.files[0].name, "..");
+	dir.files[0].dino = cur_dir_inode_no;
 
 
 
