@@ -1,3 +1,11 @@
+/*
+ * Version: 0.1
+ * Author: onesuper
+ * Email: onesuperclark@gmail.com
+ *
+ */
+
+
 #include <include/fs.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +17,6 @@
  *
  * if none inode can be found, return 0 
  *
- * dependencies
  * require:
  *   iget.c: iget() iput()
  *

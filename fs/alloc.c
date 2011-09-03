@@ -1,3 +1,10 @@
+/*
+ * Version: 0.1
+ * Author: onesuper
+ * Email: onesuperclark@gmail.com
+ *
+ */
+
 #include <include/fs.h>
 #include <stdio.h>
 #include <stdlib.h>

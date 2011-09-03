@@ -1,13 +1,18 @@
+/*
+ * Version: 0.1
+ * Author: onesuper
+ * Email: onesuperclark@gmail.com
+ *
+ *
+ * simulate the virtual device by creating a binary file 
+ * on the disk. All the device operations are replaced by
+ * fread/fwrite system calls. 
+ */
+
 #include <include/fs.h>
 #include <stdio.h>
 #include <string.h>
 
-/* 
- * simulate the virtual device by creating a binary file 
- * on the disk. All the device operations are replaced by
- * fread/fwrite system calls. 
- *
- */
 
 void format_fs(char* path, char* pwd) {
 

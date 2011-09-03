@@ -1,4 +1,48 @@
-操作系统的一个重要功能就是把一个文件名（pathname）转化成对应的inode，为此
+
+
+
+操作系统的一个重要功能就是把一个文件名（pathname）转化成对应的inode，为此需要设立一种目录（directory）数据结构
+
+
+主要方法说明
+
+unsigned int namei(const char*)
+
+参数：文件名字符串
+返回：inode号
+说明：负责搜索目录，并且找到pathname对应的inode节点号。
+
+
+void iput(struct inode_t*)
+
+参数：内存inode指针
+说明：删除一个对内存inode的连接，并且使其引用计数器减1
+
+
+struct inode_t* iget(unsigned int)
+
+参数：inode号
+返回：内存inode指针
+说明：观察inode是否存在于内存inode表中，如果没有则加入。
+
+
+struct inode_t* ialloc(void);
+
+返回：内存inode指针
+
+void ifree(unsigned int);
+
+参数：inode号
+说明
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,5 +1,5 @@
 
-
+pathname的合法性检查放到上层的Python中去完成
 
 操作系统的一个重要功能就是把一个文件名（pathname）转化成对应的inode，为此需要设立一种目录（directory）数据结构
 

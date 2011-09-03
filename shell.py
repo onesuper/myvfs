@@ -29,7 +29,11 @@ def quit_quietly():
 	# unmount the vfs
 	sys.exit()
 
-
+def check_pathname(pathname):
+	if re.match(r"^[a-zA-Z0-9._]{1,16}$", pathname):
+		return True
+	else:
+		return False
 
 '''
 Command-line Class
@@ -58,7 +62,10 @@ Type "help" or "?" for more information.'''
 		print 'ls'
 
 	def do_mkdir(self, path):
-		print path
+		if check_pathname(path):
+			print 'mkdir'
+		else:
+			print 'invalid directory name'
 	
 	def do_rmdir(self, path):
 		print path
@@ -69,7 +76,7 @@ Type "help" or "?" for more information.'''
 	def do_touch(self, path):
 		print path
 	
-	def do_rmfile(self, path):
+	def do_rm(self, path):
 		print path
 	
 	def do_open(self, path):
@@ -102,7 +109,7 @@ Type "help" or "?" for more information.'''
 	def help_rmdir(self):
 		print "..."
 
-	def help_rmfile(self):
+	def help_rm(self):
 		print "..."
 
 	def help_touch(self):

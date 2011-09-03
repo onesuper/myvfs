@@ -1,12 +1,18 @@
-#include <include/fs.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 /*
+ * Version: 0.1
+ * Author: onesuper
+ * Email: onesuperclark@gmail.com
+ *
+ *
  * some useful tools are defined here
  */
 
 
+
+#include <include/fs.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 
 /* save the superblock from memory to disk */

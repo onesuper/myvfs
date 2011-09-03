@@ -1,5 +1,16 @@
+/*
+ * Version: 0.1
+ * Author: onesuper
+ * Email: onesuperclark@gmail.com
+ *
+ * main data structures are defined in this head file
+ *
+ */
+
+
 #include "param.h"
 #include <stdio.h>
+
 
 
 /***************************************************************
@@ -16,7 +27,7 @@ struct bmap_t {
 
 /* on disk inode */
 struct d_inode_t {
-	char			type;		/* e for empty, d for data*/
+	char			type;		/* 'e' for empty, 'd' for directory*/
 	unsigned short	dnum;
 	unsigned int	no;
 	unsigned short	mode;		/* 0 for data, 1 for directory */
@@ -113,10 +124,12 @@ struct o_file_t {
 
 /* mount.c */
 extern FILE* fd;
-extern struct super_block_t sb;
-extern struct inode_p_t inode_table[NINODE];
-extern struct o_file_t o_file[NFILE];
-extern struct user_t usr;				
+extern struct super_block_t		sb;
+extern struct inode_p_t			inode_table[NINODE];
+extern struct o_file_t			o_file[NFILE];
+extern unsigned short			o_file_num;
+extern struct user_t			usr;
+extern unsigned int				cur_dir_inode_no;
 
 /* util.c */
 extern void save_super_block(void);
