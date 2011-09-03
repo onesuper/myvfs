@@ -1,0 +1,31 @@
+=====================================================
+
+Getting Started				    MyVFS 0.1
+
+=====================================================
+
+Step 1. Compile the source code:			
+
+	$make
+
+
+Step 2. Install the vfs on your disk:
+
+	$python install.py
+
+
+Step 3. Run the shell to access to the vfs:
+
+	$python shell.py
+	myvfs 0.1
+	Type "help" or "man" for more information.
+	>>> 
+
+
+Step 4. Type 'help' to get help:
+
+	>>> help
+
+=====================================================
+				    chengyichao.info
+
