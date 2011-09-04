@@ -17,9 +17,6 @@
  *
  * if none inode can be found, return 0 
  *
- * require:
- *   iget.c: iget() iput()
- *
  */
 unsigned int namei(const char *pathname) {
 	if (strcmp(pathname, "/") == 0) { /* root path */
