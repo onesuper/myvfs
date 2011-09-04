@@ -111,11 +111,11 @@ struct inode_p_t {
 
 /* opening file */
 struct o_file_t {
-	char			flag;
-	unsigned int	count;
-	int				inode;      /* point to the in core inode, -1 for NULL */
-	int				uid;
-	unsigned int	offset;
+	char				flag;
+	unsigned int		count;
+	struct inode_t*		pinode;      /* point to the in core inode */
+	int					uid;
+	unsigned int		offset;
 };
 
 

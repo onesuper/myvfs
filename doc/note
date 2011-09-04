@@ -17,6 +17,12 @@ unix在实现文件系统时使用的几个数据结构。
 通过写这个程序，最大的感受就是从unix文件系统体现出的trade off。
 
 
+常用变量说明
+
+dino_no 磁盘inode号
+pinode 内存inode指针
+sb	内存超级块实例
+fd	vfs文件指针
 
 
 pathname的合法性检查放到上层的Python中去完成
