@@ -31,14 +31,13 @@ struct inode_t* iget(unsigned int dino_id) {
 		while (temp_inode) {
 			if (temp_inode->no == key) { /* ?? */
 				/* find! */
-				temp->count++; /* increase the reference count */
+				temp_inode->count++; /* increase the reference count */
 				return temp_inode;
 			} else {
-				temp_inode = temp->forward; 
+				temp_inode = temp_inode->forward; 
 			}
 		}
 	}
-
 
 	/*
 	 * if the inode is not in the hash table:
@@ -53,8 +52,8 @@ struct inode_t* iget(unsigned int dino_id) {
 	struct inode_t *new_inode;
 	struct d_inode_t dino;
 	/* 1 */
-	addr = map_addr(dino_id);
-	new_inode = (struct inode_t)malloc(sizeof(new_inode), fd);
+	unsigned int addr = map_addr(dino_id);
+	new_inode = (struct inode_t*)malloc(sizeof(new_inode));
 	fseek(fd, addr, 0);
 	fread(&new_inode->dnum, 1, sizeof(dino), fd); /* ?? */
 	/*
@@ -68,8 +67,8 @@ struct inode_t* iget(unsigned int dino_id) {
 	 */
 	new_inode->forward = inode_hash_table[key].forward;
 	new_inode->backward = new_inode;
-	if (new_inode->foward != NULL) {
-		new_inode->foward->backward = new_inode;
+	if (new_inode->forward != NULL) {
+		new_inode->forward->backward = new_inode;
 	}
 	inode_hash_table[key].forward = new_inode;
 	/* 3 */
@@ -138,5 +137,4 @@ void iput(struct inode_t *pinode) {
 		free(pinode);
 		return;
 	}
-
 }

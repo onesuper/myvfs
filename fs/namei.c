@@ -24,16 +24,16 @@ unsigned int namei(const char *pathname) {
 	} else if (strcmp(pathname, ".") == 0) { /* current directory */
 		return cur_dir_inode_no;
 	} else {
-		/* get the cur_dir_inode via cur_dir_inode_no */
-		struct inode_t cur_dir_inode = iget(unsigned int cur_dir);
+		/* get the current dir inode via cur_dir_inode_no */
+		struct inode_t* pinode_cur = iget(cur_dir_inode_no);
 
 		/* read the dir out */
 		struct directory_t dir;
-		fseek(fd, cur_dir_inode->addr[0] * SBLOCK, 0);
+		fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
 		fread(&dir, 1, sizeof(dir), fd);   
 		
 		/* */
-		iput(cur_dir_inode);
+		iput(pinode_cur);
 
 		/* */
 		int i;

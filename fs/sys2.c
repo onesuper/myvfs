@@ -34,21 +34,21 @@ int open(const char* pathname) {
 
 	/* find free o_file in memory */
 	int i;
-	for (i=0; i<100; i++) {
-		if (o_file[i].count == 0)
+	for (i=0; i<NOFILE; i++) {
+		if (open_file[i].count == 0)
 			break;
 	}
-	if (i == 100) {
+	if (i == NOFILE) {
 		printf("Can't open more files");
 		return -1;
 	}
-	o_file[i].pinode = pinode;
-	o_file[i].count = 1; /* first open */
+	open_file[i].pinode = pinode;
+	open_file[i].count = 1; /* first open */
 	return i;
 }
 
 void close(int no) {
-	o_file[no].count = 0;
+	open_file[no].count = 0;
 	return;
 }
 

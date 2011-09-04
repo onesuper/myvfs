@@ -20,10 +20,10 @@
 
 struct super_block_t	sb;
 struct inode_p_t		inode_hash_table[NINODE];	/* in-core inode table */
-struct o_file_t			o_file[NOFILE];			/* open-file table */
+struct open_file_t		open_file[NOFILE];			/* open-file table */
 unsigned short			o_file_num;				/* num of open file */
 struct user_t			usr;					/* one user in system-root*/
-unsigned int cur_dir_inode_no		/* the inode no of current directory */ 
+unsigned int cur_dir_inode_no;		/* the inode no of current directory */ 
 FILE *fd;						/* point to the vfs file*/
 
 
@@ -56,14 +56,13 @@ void mount(char* path) {
 	/* initialize the in-core inode table */
 	int i;
 	for (i=0; i<NINODE; i++) {
-		inode_table[i].inode = NULL;
+		inode_hash_table[i].forward = NULL;
 	}
 
 	/* initialize the open-file table */
-	for (i=0; i<NFILE; i++) {
-		o_file[i].count = 0;
-		o_file[i].inode = -1;
-		o_file[i].uid = -1;
+	for (i=0; i<NOFILE; i++) {
+		open_file[i].count = 0;
+		open_file[i].pinode = NULL;
 	}
 }
 

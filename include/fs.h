@@ -106,15 +106,14 @@ struct inode_t {
  * ...
  */
 struct inode_p_t {
-	struct inode_t *inode;
+	struct inode_t* forward;
 };
 
 /* opening file */
-struct o_file_t {
+struct open_file_t {
 	char				flag;
 	unsigned int		count;
 	struct inode_t*		pinode;      /* point to the in core inode */
-	int					uid;
 	unsigned int		offset;
 };
 
@@ -126,8 +125,8 @@ struct o_file_t {
 /* mount.c */
 extern FILE* fd;
 extern struct super_block_t		sb;
-extern struct inode_p_t			inode_table[NINODE];
-extern struct o_file_t			o_file[NFILE];
+extern struct inode_p_t			inode_hash_table[NINODE];
+extern struct open_file_t		open_file[NOFILE];
 extern unsigned short			o_file_num;
 extern struct user_t			usr;
 extern unsigned int				cur_dir_inode_no;

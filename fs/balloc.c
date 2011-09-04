@@ -37,10 +37,10 @@ unsigned int balloc(void) {
 			fseek(fd, 2 + SBLOCK * 50 *i, 0);
 			fread(&bmap, 1, sizeof(bmap), fd);
 			for (j=0; j<49; j++) {
-				if (map.use[j] == 0) { /* if free */
-					map.use[j] = 1;
+				if (bmap.use[j] == 0) { /* if free */
+					bmap.use[j] = 1;
 					/* push into the stack */ 
-					sb.free_block_stack[sb.free_block_sp] = map.addr[j];
+					sb.free_block_stack[sb.free_block_sp] = bmap.addr[j];
 					sb.free_block_sp--;
 					count++;
 					if (count == 50) {
@@ -50,7 +50,7 @@ unsigned int balloc(void) {
 				}
 			}
 			/* change the 12 bmaps */
-			fseek(fdm, 2 + SBLOCK * 50 * i, 0);
+			fseek(fd, 2 + SBLOCK * 50 * i, 0);
 			fwrite(&bmap, 1, sizeof(bmap), fd);
 			if (flag == 1)
 				break;
@@ -79,22 +79,22 @@ void bfree(unsigned int block_no) {
 	 * at one time
 	 */
 	struct bmap_t bmap;
-	int offset;
-	unsigned int block_no;
+	int offset, i;
+	unsigned int block_no_temp;
 	if (sb.free_block_sp == 100) {
 		for(i=0; i<50; i++) {
-			block_no = sb.free_block_stack[sb.free_block_sp - 1];
-			sb.free_block--; /* pop a block */
+			block_no_temp = sb.free_block_stack[sb.free_block_sp - 1];
+			sb.free_block_sp--; /* pop a block */
 
 			/* in order to find the bit
 			 * in the bmap to set
 			 */
-			offset = (block_no - 2) % 50;
+			offset = (block_no_temp - 2) % 50;
 
-			fseek(fd, SBLOCK * block_no, 0);
+			fseek(fd, SBLOCK * block_no_temp, 0);
 			fread(&bmap, 1, sizeof(bmap), fd);
-			map.free_block_num++;
-			map.use[offset-1] = 0; /* not in use now */
+			bmap.free_block_num++;
+			bmap.use[offset-1] = 0; /* not in use now */
 			fwrite(&bmap, 1, sizeof(bmap), fd); /* write back */
 		}
 	}

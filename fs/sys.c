@@ -101,7 +101,7 @@ void mkdir(const char* pathname) {
 		return;	
 
 	/* alloc an new inode */
-	struct inode_t pinode = ialloc();
+	struct inode_t* pinode = ialloc();
 	if (pinode == NULL) {
 		bfree(block_no);  /* rollback~ */
 		return;
@@ -133,7 +133,7 @@ void mkdir(const char* pathname) {
 	struct inode_t *pinode_cur = iget(cur_dir_inode_no);
 
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fread(&cur_dir, 1, sizeof(cur_dir, fd));
+	fread(&dir_cur, 1, sizeof(dir_cur), fd);
 	dir_cur.files[dir_cur.size] = new_file;		/* append to it */
 	dir_cur.size++;
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
@@ -180,8 +180,8 @@ void touch(const char* pathname) {
 	struct inode_t *pinode_cur = iget(cur_dir_inode_no);
 	struct directory_t dir_cur;
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fread(&cur_dir, 1, sizeof(cur_dit), fd); 
-	dir_cur.files[cur_dir.size] = new_file;
+	fread(&dir_cur, 1, sizeof(dir_cur), fd); 
+	dir_cur.files[dir_cur.size] = new_file;
 	dir_cur.size++;
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
 	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);	/* write back */
@@ -208,7 +208,7 @@ void rm(const char* pathname) {
 		return;
 	}
 
-	struct inode_t pinode = iget(dinode_no);
+	struct inode_t* pinode = iget(dinode_no);
 	
 	/* not a file but a directory */
 	if (pinode->type != 'f') {
@@ -225,7 +225,7 @@ void rm(const char* pathname) {
 	 */
 	int i; 
 	for (i=0; i<100; i++) {
-		if (o_file[i].count > 0 && o_file[i].inode->dino == dinode_no) {
+		if (open_file[i].count > 0 && open_file[i].pinode->dino == dinode_no) {
 			printf("the file is already opened");
 			return;
 		}
@@ -242,7 +242,7 @@ void rm(const char* pathname) {
 	 * by searching all the nodes below it
 	 */
 	for (i=0; i<dir_cur.size; i++) {
-		if (dir_cur.files[i].dino = dinode_no) {
+		if (dir_cur.files[i].dino == dinode_no) {
 			dir_cur.size--;
 			dir_cur.files[i] = dir_cur.files[dir_cur.size];
 			/* move the stack-top element to the dead one's
@@ -308,8 +308,9 @@ void rmdir(const char* pathname) {
 	 * delete the exact dinode under the current directory
 	 * by searching all the nodes below it
 	 */
+	int i;
 	for (i=0; i<dir_cur.size; i++) {
-		if (dir_cur.files[i].dino = dinode_no) {
+		if (dir_cur.files[i].dino == dinode_no) {
 			dir_cur.size--;
 			dir_cur.files[i] = dir_cur.files[dir_cur.size];
 			/* move the stack-top element to the dead one's
