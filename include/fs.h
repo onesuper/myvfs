@@ -11,8 +11,6 @@
 #include "param.h"
 #include <stdio.h>
 
-
-
 /***************************************************************
  *    on disk data structures
  ***************************************************************/
@@ -22,7 +20,7 @@
 struct bmap_t {
 	char			use[49];		/* 1 for used, 0 for free */
 	unsigned int	addr[49];		/* physical address of each block */
-	unsigned short	free_block_num;         /* number of free blocks */          
+	unsigned short	free_block_num; /* number of free blocks */          
 };
 
 /* on disk inode */
@@ -40,6 +38,7 @@ struct super_block_t {
 	
 	unsigned int	inode_block_num;			/* number of inode blocks */
 	unsigned int	data_block_num;				/* number of data blocks */
+	
 	unsigned int	free_block_num;				/* number of free blocks */
 	unsigned int	free_block_stack[NINODE];	/* stack of free block */
 	unsigned short	free_block_sp;				/* stack pointer */
@@ -47,6 +46,7 @@ struct super_block_t {
 	unsigned int	free_inode_num;				/* number of free inode */
 	unsigned int	free_inode_stack[NINODE];	/* stack of free inode */
 	unsigned short	free_inode_sp;				/* stack pointer */
+	
 	char			modified;					/* whether ths sb has been
 												   modified */
 };
@@ -106,7 +106,7 @@ struct inode_t {
  * ...
  */
 struct inode_p_t {
-	struct inode_t* forward;
+	struct inode_t* forward;	/* point to first inode in the chain*/
 };
 
 /* opening file */

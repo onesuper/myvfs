@@ -42,22 +42,22 @@ struct inode_t* iget(unsigned int dino_id) {
 	/*
 	 * if the inode is not in the hash table:
 	 *
-	 * 1.read it from disk and create a in-core inode
+	 * <1>. read it from disk and create a in-core inode
 	 * and return it.
 	 *
-	 * 2.add it into hash table.
+	 * <2>. add it into hash table.
 	 *
-	 * 3.update the flags.
+	 * <3>. update the flags.
 	 */
 	struct inode_t *new_inode;
 	struct d_inode_t dino;
-	/* 1 */
+	/* <1> */
 	unsigned int addr = map_addr(dino_id);
 	new_inode = (struct inode_t*)malloc(sizeof(new_inode));
 	fseek(fd, addr, 0);
 	fread(&new_inode->dnum, 1, sizeof(dino), fd); /* ?? */
 	/*
-	 * 2
+	 * <2>
 	 *
 	 * before:
 	 * [key1]->(inode1)->(inode2)
@@ -71,7 +71,7 @@ struct inode_t* iget(unsigned int dino_id) {
 		new_inode->forward->backward = new_inode;
 	}
 	inode_hash_table[key].forward = new_inode;
-	/* 3 */
+	/* <3> */
 	new_inode->count = 1;  /* a fairly new one */
 	new_inode->flag = 0;
 	new_inode->no = key; /* ?????? */

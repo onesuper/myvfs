@@ -28,25 +28,29 @@ FILE *fd;						/* point to the vfs file*/
 
 
 /* 
- * load the information from disk to memory
- * the main information includes:
- * 1.superblock
- * 2.user password
+ * load the information of vfs into memory including:
+ * 1. superblock
+ * 2. user
+ * 3. current dir
+ *
+ * and get some in-core stuff ready including:
+ * 1. in-core inode table (hashed)
+ * 2. open file table
  */
-
 void mount(char* path) {
-	fd = fopen(path, "rwb");
 
+	/* open the vfs on the disk */
+	fd = fopen(path, "rwb");
 	if (fd == NULL) {
-		printf("the vfs file cannot be loaded!\n");
+		printf("vfs file cannot be opened\n");
 		exit(0);
 	}
 
 	/* read the user information */
-	fseek(fd, 0 * SBLOCK, 0);
+	fseek(fd, 0, 0);
 	fread(&usr, 1, sizeof(usr), fd);
 
-	/* set the currenct dir */
+	/* set the current dir, $1 */
 	cur_dir_inode_no = usr.dino;
 
 	/* read the superblock*/
@@ -64,6 +68,8 @@ void mount(char* path) {
 		open_file[i].count = 0;
 		open_file[i].pinode = NULL;
 	}
+
+	return;
 }
 
 

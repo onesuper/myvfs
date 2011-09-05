@@ -3,7 +3,6 @@
  * Author: onesuper
  * Email: onesuperclark@gmail.com
  *
- *
  * simulate the virtual device by creating a binary file 
  * on the disk. All the device operations are replaced by
  * fread/fwrite system calls. 
@@ -11,103 +10,138 @@
 
 #include <include/fs.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-
+/*
+ * format all the on-disk structures including:
+ *
+ * 1. find the vfs and open
+ * 2. twelve bitmaps	#402~#1001
+ * 3. on-disk inode		#2~#401
+ * 4. root dinode		$1
+ * 5. root directory	#403
+ * 6. usr info			#0
+ * 7. super block		#1
+ *
+ * which can be easily pictured as:
+ * user superblock	on-disk inodes						free blocks and bitmap
+ * [0]	[1]					[2]................[401]	[402].......................[1001]
+ */
 void format_fs(char* path, char* pwd) {
 
-
+	/* open vfs */
 	FILE *fd = fopen(path, "r+w+b");
+	if (fd == NULL) 
+	{
+		printf("vfs does not exist\n");
+		exit(0);
+	}
+	printf("find the vfs\n");
 
 	/* 
-	 * create a 12 bitmap from #400 to #1000
-	 * each bitmap control 50 blocks (#400~#449 ... #1000~1049)
+	 * create 12 bitmaps and store them at
+	 * #402		#452	#502	#552	#602	#652
+	 * #702		#752	#802	#852	#902	#952
+	 *
+	 * each bitmap manages the next nearby 49 blocks
+	 * e.g. the bitmap stored in #402 manages #403~#451
 	 */
 	struct bmap_t bmap;
 	int i, j;
-	for (i=NIBLOCK; i<=NIBLOCK + NDBLOCK; i += 50) {
-		for(j=1; j<50; j++) {
-			bmap.use[j] = 0;
-			bmap.addr[j] = i + j + 1;
+	for (i=NIBLOCK + 2; i<NIBLOCK + NDBLOCK + 1; i+=50) {  /* [402, 1001) */
+		for(j=1; j<50; j++) {	/* [1, 49] */
+			bmap.use[j] = 0; 
+			bmap.addr[j] = i + j; /* 1 + 402 = 403, 49 + 402 = 451 */
 			bmap.free_block_num = 49;
 		}
 		fseek(fd, i * SBLOCK, 0);
 		fwrite(&bmap, 1, sizeof(bmap), fd);
 	}
+	printf("bitmap done\n");
 
-	printf("bitmap\n");
-		
 	/* 
-	 * write the on-disk inode block on the disk
-	 * one by one 
+	 * initialize the on-disk inode(dinode)
+	 * dinode's number = size of inode block area / size of dinode
+	 * the inode block area starts at #2
+	 *
+	 * NOTE: THE DINODE.NO STARTS FROM 1 BUT NOT 0
 	 */
-	struct d_inode_t dino;
-	dino.mode = 0;
-	dino.no = 1;
-	dino.size = 0;
-	dino.type = 'e';  /* empty */
-	for (i=0; i<NIBLOCK * SBLOCK / sizeof(dino); i++) {
-		fseek(fd, SBLOCK * 1 + i * sizeof(dino), 0);					/* the inode block starts at #2 */
-		fwrite(&dino, 1, sizeof(dino), fd);		
-		dino.no++;							
+	struct d_inode_t dinode;
+	dinode.mode = 0;
+	dinode.no = 1;
+	dinode.size = 0;
+	dinode.type = 'e';  /* empty */
+	for (i=0; i<NIBLOCK * SBLOCK / sizeof(dinode); i++) {		
+		fseek(fd, SBLOCK * 2 + i * sizeof(dinode), 0);		/* the inode block starts at #2 */
+		fwrite(&dinode, 1, sizeof(dinode), fd);		
+		dinode.no++;							
 	}
+	printf("on-disk inode done\n");
 
-	printf("on-disk inode\n");
+	/*
+	 * create the user(root)'s directory inode
+	 * write it at $1
+	 */
+	dinode.size = 1;	
+	dinode.mode = 1;					/* ??? */
+	dinode.type = 'd';					/* directory */
+	dinode.dnum = 1;					/* ??? */
+	dinode.addr[0] = NIBLOCK + 2 + 1;	/* #403 */
+	dinode.no = 1;						/* root inode is $1 */
+	fseek(fd, map_addr(dinode.no), 0);
+	fwrite(&dinode, 1, sizeof(dinode), fd);
 
-	/* create the user(root) inode */
-	dino.size = 1;
-	dino.type = 'd';
-	dino.dnum = 1;  /* ??? */
-	dino.addr[0] = NIBLOCK + 2 + 1;
-	dino.no = 1;    /* root inode is $1 inode */
-	
-	/* write root inode */
-	fseek(fd, map_addr(dino.no), 0);
-	fwrite(&dino, 1, sizeof(dino), fd);
-
-	/* write root dir */
+	/* create root dir at #403 */
 	struct directory_t dir;
-	dir.size = 0;  /* empty at first */
-	fseek(fd, SBLOCK * (1 + 2 + NIBLOCK), 0);
+	dir.size = 0;						/* nothing in the root dir at first */
+	fseek(fd, SBLOCK * (NIBLOCK + 2 +1), 0);
 	fwrite(&dir, 1, sizeof(dir), fd);
+	printf("root dir done\n");
 
-	printf("root dir\n");
-	
-	/* create usr information at #0 */
+	/* since the #403 is used, adjust the bitmap in #402 */
+	fseek(fd, 402 * SBLOCK, 0);
+	fread(&bmap, 1, sizeof(bmap), fd);
+	bmap.use[1] = 1;
+	bmap.free_block_num--;
+	fseek(fd, 402 * SBLOCK, 0);
+	fwrite(&bmap, 1, sizeof(bmap), fd);
+
+	/* create usr at #0 */
 	struct user_t usr;
 	strcpy(usr.name, "root");  
 	strcpy(usr.password, pwd);
-	usr.dino = 1;
-	fseek(fd, 0 * SBLOCK, 0);
+	usr.dino = 1;				/* $1 */
+	fseek(fd, 0, 0);
 	fwrite(&usr, 1, sizeof(usr), fd);
-
-	printf("user information\n");
+	printf("user done\n");
 
 	/* create super block at #1 */
 	struct super_block_t sb;
-	sb.data_block_num = NDBLOCK / 50 * 49;  /* 1 is used to store bmap*/
-	sb.inode_block_num = NIBLOCK / 50 * 49;
-	sb.free_block_num = NDBLOCK / 50 * 49;
-	sb.free_block_sp = 0;		/* the stack is empty */
-	sb.free_inode_num = NIBLOCK * SBLOCK / sizeof(dino);
+	sb.data_block_num = NDBLOCK - ( NDBLOCK / 50 );		/* 600 - 12 = 588 */
+	sb.inode_block_num = NIBLOCK;						/* 400 */
+	sb.free_block_num = NDBLOCK - ( NDBLOCK / 50 ) - 1;	/* one for root block*/
+	sb.free_block_sp = 0;	
+	sb.free_inode_num = NIBLOCK * SBLOCK / sizeof(dinode) - 1; /* one for root inode */
 	sb.free_inode_sp = 0;
 	sb.modified = 0;
 	fseek(fd, SBLOCK * 1, 0);  
 	fwrite(&sb, 1, sizeof(sb), fd);
+	printf("super block done\n");
 
-	printf("superblock\n");
-
-
-
-	/* close the file handler*/
+	/* close the file handler and return */
 	fclose(fd);
-
 	return;
 }
 
-/* find the position of d_inode according to the no */
+/*
+ * find dinode's physical address according to no
+ * since the dinode are alloced sequently
+ * if the given no is 1, the addr is 2
+ * if the given no is x, the addr is 2 + (x - 1) * sizeof(dinode)
+ */
 unsigned long map_addr(unsigned int no) {
-	struct d_inode_t dino;
-	unsigned long addr = 2 + sizeof(dino) * (no - 1);
+	struct d_inode_t dinode;
+	unsigned long addr = 2 + sizeof(dinode) * (no - 1);
 	return addr;
 }
