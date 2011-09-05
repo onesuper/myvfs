@@ -15,22 +15,27 @@
 #include <string.h>
 
 
-/* save the superblock from memory to disk */
+/* save sb from memory to disk */
 void save_super_block() {
-	fseek(fd, 1, 0);
+	fseek(fd, SBLOCK * 1, 0);
 	fwrite(&sb, 1, sizeof(sb), fd);
 	return;
 }
 
-/* find the position of d_inode according to the no */
+/*
+ * find dinode's physical address according to no
+ * since the dinode are alloced sequently
+ * if the given no is 1, the addr is 2
+ * if the given no is x, the addr is 2 + (x - 1) * sizeof(dinode)
+ */
 unsigned long map_addr(unsigned int no) {
-	struct d_inode_t dino;
-	unsigned long addr = 2 + sizeof(dino) * (no - 1);
+	struct d_inode_t dinode;
+	unsigned long addr = 2 + sizeof(dinode) * (no - 1);
 	return addr;
 }
 
 /* 
- * judge if the password is correct
+ * verify the password
  */
 char verify(char* password) {
 	if (strcmp(password, usr.password) == 0)

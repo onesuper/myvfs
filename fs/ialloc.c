@@ -12,70 +12,75 @@
 #include <stdlib.h>
 
 /*
- * alloc a inode on the disk
+ * firstly, ialloc() allocates a d_inode
+ * secondly, ialloc() calls iget() to get
+ * a inode in the memory 
+ * 
+ * return a inode pointer if succeed
+ * else return a NULL pointer
  */
 struct inode_t *ialloc(void) {
 
-	/* no free inode left */
+	/* if running out of free inode */
 	if (sb.free_inode_num == 0) {
 		printf("running out of inode");
 		return NULL;
 	}
-	
 
-	/* put more free inode in the stack */
+	/*
+	 * if the free node stack is empty,
+	 * search the inode area and find 50 free inodes
+	 */
+	unsigned long addr;
+	int i;
+	int count = 0;
+	char find50 = 0;			/* set only if find 50 inodes */
+	struct d_inode_t dinode;	
 	if (sb.free_inode_sp == 0) {
-
-		struct d_inode_t dino; /* the readin on-disk inode */
 		/* 
-		 * search the on-disk inode area
-		 * and find 50 empty inode to supply the stack
+		 * search the entire inode area until find 50 free inodes
 		 */
-		
-
-		/* destination */
-		unsigned long addr;
-		unsigned int i;
-		int count = 0;
-
-		for (i=0; i<NIBLOCK * SBLOCK / sizeof(dino); i++) {
-			addr = map_addr(i);  /* find the physical block */
+		for (i=0; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {
+			addr = map_addr(i);		/* physical addr of d_inode*/
 			fseek(fd, addr, 0);
-			fread(&dino, 1, sizeof(dino), fd);
-			if (dino.type == 'e') {
+			fread(&dinode, 1, sizeof(dinode), fd);
+			/* only empty one can be alloced */
+			if (dinode.type == 'e') {
 				/* stack grows */
-				sb.free_inode_stack[sb.free_inode_sp] = dino.no;
-				sb.free_inode_sp ++;
-				
-				/* change the state of the dino and write back */
-				dino.type = 's';
+				sb.free_inode_stack[sb.free_inode_sp] = dinode.no;
+				sb.free_inode_sp++;
+				/*
+				 * now change the d_inode's type and write back
+				 */
+				dinode.type = 's';	/* ??? */
 				fseek(fd, addr, 0);
-				fwrite(&dino, 1, sizeof(dino), fd);
+				fwrite(&dinode, 1, sizeof(dinode), fd);
 				count ++;
 				if (count == 50) {
+					find50 = 1;
 					break; 
 				}
 			}
 		}
+		/* can't find 50 free inodes */
+		if (find50 = 0) { 
+			printf("running out of on-disk inodes");
+			return NULL;
+		}
 	}
 
-	/* allocate the on-disk inode in the top of stack */
-	unsigned int no_to_alloc = sb.free_inode_stack[sb.free_inode_sp];
-	
-	/* find the inode to alloc by iget() */
-	struct inode_t *temp_inode = iget(no_to_alloc);
-	
-	/* */
-	unsigned long alloc_addr = map_addr(no_to_alloc);
-	fseek(fd, alloc_addr, 0);
-	fwrite(&temp_inode->dnum, 1, sizeof(temp_inode), fd);
+	/* allocate the stack-top d_inode and save the super block */
+	unsigned int dinode_no = sb.free_inode_stack[sb.free_inode_sp];
 	sb.free_inode_sp--;
 	sb.free_inode_num--;
-
 	save_super_block();
-
-	return temp_inode;
-
+	
+	/* 
+	 * call iget() to get the inode's pointer through dinode_no
+	 * then return it
+	 */
+	struct inode_t* pinode = iget(dinode_no);
+	return pinode;
 }
 
 
@@ -110,6 +115,3 @@ void ifree(unsigned int dino_id) {
 	sb.free_inode_num++;
 	return;
 }
-
-
-

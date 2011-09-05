@@ -6,101 +6,64 @@
  */
 
 
-
 #include <include/fs.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 /* 
- * get the in-core inode via the on-disk inode's id.
- *	
- * the function  is called when a file is opened.
+ * get an inode through dinode_no
  */
-struct inode_t* iget(unsigned int dino_id) {
+struct inode_t* iget(unsigned int dinode_no) {
 
-	/* 
-	 * if the inode is already in the hash table
-	 * try to find and return it
-	 * get the key first and look up by the chain
+	struct inode_t* pinode;
+	int key = dinode_no % NINODE;					/* calculate the key */
+
+	/*
+	 * check the inode table first
+	 * if the inode isin the hash table
+	 * just find and return it
 	 */
-	struct inode_t *temp_inode;
-	int key = dino_id % NINODE;
-
-	if (inode_hash_table[key].forward != NULL) {
-		temp_inode = inode_hash_table[key].forward;
-		while (temp_inode) {
-			if (temp_inode->no == key) { /* ?? */
-				/* find! */
-				temp_inode->count++; /* increase the reference count */
-				return temp_inode;
+	if (inode_hash_table[key].forward != NULL) {	
+		pinode = inode_hash_table[key].forward;		/* enter the chain */
+		while (pinode != NULL) {
+			if (pinode->dino == dinode_no) {		
+				pinode->count++;					/* increase the reference count */
+				return pinode;					
 			} else {
-				temp_inode = temp_inode->forward; 
+				pinode = pinode->forward;			/* next */
 			}
 		}
 	}
 
 	/*
-	 * if the inode is not in the hash table:
-	 *
-	 * <1>. read it from disk and create a in-core inode
-	 * and return it.
-	 *
-	 * <2>. add it into hash table.
-	 *
-	 * <3>. update the flags.
+	 * if the inode is not in the hash table
+	 * create a new one and add to it
 	 */
-	struct inode_t *new_inode;
-	struct d_inode_t dino;
-	/* <1> */
-	unsigned int addr = map_addr(dino_id);
-	new_inode = (struct inode_t*)malloc(sizeof(new_inode));
-	fseek(fd, addr, 0);
-	fread(&new_inode->dnum, 1, sizeof(dino), fd); /* ?? */
-	/*
-	 * <2>
-	 *
-	 * before:
-	 * [key1]->(inode1)->(inode2)
-	 *
-	 * after:
-	 * [key1]->(new_inode)->(inode1)->(inode2)
-	 */
-	new_inode->forward = inode_hash_table[key].forward;
-	new_inode->backward = new_inode;
-	if (new_inode->forward != NULL) {
-		new_inode->forward->backward = new_inode;
+	struct inode_t inode_new;
+	pinode = (struct inode_t*)malloc(sizeof(inode_new));	/* create by malloc() */
+	pinode->dino = dinode_no;								/* record the dinode_no */						
+
+	/* add to hash table */
+	pinode->forward = inode_hash_table[key].forward;
+	pinode->backward = pinode;
+	if (pinode->forward != NULL) {
+		pinode->forward->backward = pinode;
 	}
-	inode_hash_table[key].forward = new_inode;
-	/* <3> */
-	new_inode->count = 1;  /* a fairly new one */
-	new_inode->flag = 0;
-	new_inode->no = key; /* ?????? */
+	inode_hash_table[key].forward = pinode;
 
+	/* set inode's state */
+	pinode->count = 1;		/* a fairly new one */
+	pinode->flag = 0;		/* update?? */
 
-
-	return new_inode;
+	return pinode;
 }
 
 
 /* 
- * pinode point to the existing inode in the hash table
- * which belongs to the openning file.
- *
- * the function is called when a file is closed.
- *
- * it will delete a in-core inode and reduce the reference
- * count.
- *
+ * delete a inode and reduce the reference count
  */
 void iput(struct inode_t *pinode) {
 
-	/* find the */
-	unsigned long addr;
-	struct d_inode_t dino;
-	addr = map_addr(pinode->dino);
-	fseek(fd, addr, 0);
-	fwrite(&pinode->dnum, 1, sizeof(dino), fd); /* */
-	
 	/*
 	 * if the inode is still referenced by other file
 	 * do not have to release it
@@ -109,29 +72,15 @@ void iput(struct inode_t *pinode) {
 		pinode->count--;
 		return;
 	}
+
 	/*
 	 * else the inode must be removed from the hash table
 	 */
-	if (pinode->forward == NULL) {
-		/*
-		 * before:
-		 * [key1]->(inode1)->(inode2)->(target_inode)
-		 *
-		 * after:
-		 * [key1]->(inode1)->(inode2)->NULL
-		 */
+	if (pinode->forward == NULL) {		/* inode in the end of chain */
 		pinode->backward->forward = NULL;
 		free(pinode);
 		return;
-	} else {
-		/*
-		 * before:
-		 * [key1]->(inode1)->(taget_inode)->(inode2)
-		 *
-		 * after:
-		 * [key1]->(inode1)->(inode2)
-		 *
-		 */
+	} else {			/* in the middle */
 		pinode->forward->backward = pinode->backward;
 		pinode->backward->forward = pinode->forward;
 		free(pinode);

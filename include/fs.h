@@ -25,7 +25,7 @@ struct bmap_t {
 
 /* on disk inode */
 struct d_inode_t {
-	char			type;		/* 'e'mpty, 'd'irectory, 'f'ile */
+	char			type;		/* 'e'mpty, 's' */
 	unsigned short	dnum;
 	unsigned int	no;
 	unsigned short	mode;		/* 0 for data, 1 for directory */
@@ -82,13 +82,10 @@ struct user_t {
 struct inode_t {
 	struct inode_t* forward;    /* forward inode */
 	struct inode_t* backward;	/* backward inode */
-	unsigned int	no;		
 	unsigned int	count;		/* referece count */
 	unsigned short  flag;		/* updated ?*/
 	char			type;		/* 'f'ile, 'd'irectory */
 	unsigned int	dino;		/* disk inode no */	
-	unsigned short	dnum;		/* dino physical block num */
-
 	unsigned short	mode;		/* ? */
 	unsigned int	size;		
 	unsigned int	addr[50];	/* physical block no */
@@ -106,7 +103,7 @@ struct inode_t {
  * ...
  */
 struct inode_p_t {
-	struct inode_t* forward;	/* point to first inode in the chain*/
+	struct inode_t* forward;		/* point to first inode in the chain*/
 };
 
 /* opening file */
