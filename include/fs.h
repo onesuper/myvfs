@@ -54,7 +54,7 @@ struct super_block_t {
 /* file on the disk */
 struct file_t {
 	unsigned int	dino;	  /* on disk inode number */
-	char			name[24]; /* in unix is 14 */ 
+	char			name[24]; /* unix's is 14 */ 
 };
 
 
@@ -86,7 +86,6 @@ struct inode_t {
 	unsigned short  flag;		/* updated ?*/
 	char			type;		/* 'f'ile, 'd'irectory */
 	unsigned int	dino;		/* disk inode no */	
-	unsigned short	mode;		/* ? */
 	unsigned int	size;		
 	unsigned int	addr[50];	/* physical block no */
 };

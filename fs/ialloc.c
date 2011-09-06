@@ -62,7 +62,7 @@ struct inode_t *ialloc(void) {
 			}
 		}
 		/* can't find 50 free inodes */
-		if (find50 = 0) { 
+		if (find50 == 0) { 
 			printf("running out of on-disk inodes");
 			return NULL;
 		}

@@ -16,7 +16,6 @@
 /* 
  * list the all the files and directories
  * under current directory
- *
  */
 void ls(void) {
 
@@ -32,6 +31,11 @@ void ls(void) {
 	fread(&dir, 1, sizeof(dir), fd);
 	iput(pinode);
 	
+	/* 
+	 * delete the target dinode under the current directory
+	 * by searching all the nodes below it
+	 */
+
 	/* print */
 	int i;
 	for (i=0; i<dir.size; i++) {
@@ -49,26 +53,30 @@ void ls(void) {
  */
 void cd(const char* pathname) {
 	
+	printf("cd starts\n");
 	/*
 	 * get pinode in memory
 	 */
 	int dinode_no = namei(pathname);
 	if (dinode_no == 0) {
-		printf("No such file or directory");
+		printf("No such file or directory\n");
 		return;
 	}
 	struct inode_t* pinode = iget(dinode_no);
 	if (pinode == NULL) {
-		printf("No such file or directory");
+		printf("No such file or directory\n");
 		return;
 	}
 	if (pinode->type != 'd') {
-		printf("Not a directory");
+		printf("Not a directory\n");
 		return;
 	}
 	
 	/* change the cur dir */
 	cur_dir_dinode_no = dinode_no;
+
+	printf("cd ends\n");
+	return;
 }
 
 /*
@@ -80,11 +88,12 @@ void cd(const char* pathname) {
  *
  */
 void mkdir(const char* pathname) {
-
+	
+	printf("mkdir starts\n");
 	/* ensure not exist */
 	unsigned int dinode_no = namei(pathname);
 	if (dinode_no != 0) {
-		printf("File or directory exists");
+		printf("File or directory exists\n");
 		return;
 	}
 		
@@ -122,8 +131,7 @@ void mkdir(const char* pathname) {
 	pinode->size = 1;				/* new dir's size */
 	pinode->addr[0] = block_no;
 	pinode->type = 'd'; 
-	pinode->mode = '0';				/* ??? */	
-	new_dinode_no = pinode->dino	/* remember the dino */
+	new_dinode_no = pinode->dino;	/* remember the dino */
 	iput(pinode);					/* release inode after using it */
 
 	/* 
@@ -148,6 +156,7 @@ void mkdir(const char* pathname) {
 	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);		/* write back */
 	iput(pinode_cur);								/* release inode */
 
+	printf("mkdir ends\n");
 	return;
 }
 
@@ -160,190 +169,180 @@ void mkdir(const char* pathname) {
  * pathname to it.
  *
  */
-
 void touch(const char* pathname) {
 
-	/* if it is already there */
+	printf("touch starts\n");
+
+	/* ensure not exist */
 	unsigned int dinode_no = namei(pathname);
 	if (dinode_no != 0) {
-		printf("File or directory exists");
+		printf("File or directory exists\n");
 		return;
 	}
 	
 	/* 
 	 * create a file using allocated dinode 
-	 * alloc a new inode
+	 * then allocate a new inode
 	 */
 	struct inode_t *pinode = ialloc();
 	if (pinode == NULL)
 		return;
 	pinode->size = 0;
 	pinode->type = 'f';
-	pinode->mode = '1';
 	struct file_t file;
 	strcpy(file.name, pathname);
-	file.dino = pinode->dino;
+	file.dino = pinode->dino;	/* binding the file with dinode */
 	iput(pinode);				/* release inode */
 
-	/* add it to the current directory */
-	struct inode_t *pinode_cur = iget(cur_dir_inode_no);
-	struct directory_t dir_cur;
-	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fread(&dir_cur, 1, sizeof(dir_cur), fd); 
-	dir_cur.files[dir_cur.size] = file;
-	dir_cur.size++;
-	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);	/* write back */
-	iput(pinode_cur);	/* release inode */
+	/* add the file to the current directory */
+	pinode = iget(cur_dir_dinode_no);
+	struct directory_t dir;
+	fseek(fd, pinode->addr[0] * SBLOCK, 0);
+	fread(&dir, 1, sizeof(dir), fd); 
+	dir.files[dir.size] = file;
+	dir.size ++;
+	fseek(fd, pinode->addr[0] * SBLOCK, 0);
+	fwrite(&dir, 1, sizeof(dir), fd);		/* write back */
+	iput(pinode);							/* release inode */
 
+	printf("touch ends\n");
 	return;
 }
 
 /*
  * remove a file from the vfs:
- *
- * 1.process the currect diretory
- * 2.release the block it takes
- * 3.free the on-disk inode
  */
 void rm(const char* pathname) {
 
-	/* get the dinode no via namei() */
-	unsigned int dinode_no = namei(pathname);
+	printf("rm starts\n");
 
-	/* can not find */
+	/* ensure present */
+	unsigned int dinode_no = namei(pathname);
 	if (dinode_no == 0) {
-		printf("No such file or directory");
+		printf("No such file or directory\n");
 		return;
 	}
-
-	struct inode_t* pinode = iget(dinode_no);
-	
+		
 	/* not a file but a directory */
+	struct inode_t* pinode = iget(dinode_no);
 	if (pinode->type != 'f') {
-		printf("Is a directory");
-		iput(pinode);		/* release inode */
+		printf("Is a directory\n");
+		iput(pinode);
 		return;
 	}
 	iput(pinode);  /* release the inode */
 	
 	/* 
-	 * check the o_file[100]
-	 *
+	 * check the open_file[100]
 	 * if the file is being opened, denied to remove
 	 */
 	int i; 
 	for (i=0; i<100; i++) {
 		if (open_file[i].count > 0 && open_file[i].pinode->dino == dinode_no) {
-			printf("the file is already opened");
+			printf("the file is already opened\n");
 			return;
 		}
 	}
 
-	/* get the current dir */
-	struct inode_t* pinode_cur = iget(cur_dir_inode_no);
-	struct directory_t dir_cur;
-	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fread(&dir_cur, 1, sizeof(dir_cur), fd);
-
 	/* 
-	 * delete the exact dinode under the current directory
-	 * by searching all the nodes below it
+	 * get the current dir, then delete the target
+	 * dinode under the current directory by searching
+	 * all the nodes below it
 	 */
-	for (i=0; i<dir_cur.size; i++) {
-		if (dir_cur.files[i].dino == dinode_no) {
-			dir_cur.size--;
-			dir_cur.files[i] = dir_cur.files[dir_cur.size];
+	pinode = iget(cur_dir_dinode_no);
+	struct directory_t dir;
+	fseek(fd, pinode->addr[0] * SBLOCK, 0);
+	fread(&dir, 1, sizeof(dir), fd);
+	for (i=0; i<dir.size; i++) {
+		if (dir.files[i].dino == dinode_no) {
 			/* move the stack-top element to the dead one's
-			 * place
+			 * place, and the stack shrink
 			 */
+			dir.size--;
+			dir.files[i] = dir.files[dir.size];
 			break; /* stop searching */
 		}
 	}
-	
-	/* write back the current directory */
-	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);
-	iput(pinode_cur);	/* release the inode */
+	/* write back the current dir */
+	fseek(fd, pinode->addr[0] * SBLOCK, 0);
+	fwrite(&dir, 1, sizeof(dir), fd);
+	iput(pinode);
 
-	/* release the blocks the inode takes */
+	/* free the blocks of the target file */
 	pinode = iget(dinode_no);
 	for (i=0; i<pinode->size; i++) {
 		bfree(pinode->addr[i]);
 	}
 	iput(pinode);
 	
-	/* free the on disk inode  */
+	/*  finally free the d_inode  */
 	ifree(dinode_no);
-
+	
+	printf("rm ends\n");
 	return;
 }
 
 /*
  * remove a directory from the vfs
- * 1.disappear from the current dir
- * 2.
- *
  */
 void rmdir(const char* pathname) {
+
+	printf("rmdir starts\n");
 
 	/* refuse to remove the root dir */
 	if (strcmp("/", pathname))
 		return;
 	
-	/* can not find */
+	/* ensure present */
 	unsigned int dinode_no = namei(pathname);
 	if (dinode_no == 0) {
-		printf("No such file or directory");
+		printf("No such file or directory\n");
 		return;
 	}
 	
 	/* not a directory but a file */
 	struct inode_t* pinode = iget(dinode_no);
 	if (pinode->type != 'd') {
-		printf("Is a file");
+		printf("Is a file\n");
 		iput(pinode);		/* release inode */
 		return;
 	}
 	iput(pinode);  /* release the pinode */
 
-	/* get current dir */
-	struct inode_t* pinode_cur = iget(cur_dir_inode_no);
-	struct directory_t dir_cur;
-	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fread(&dir_cur, 1, sizeof(dir_cur), fd);
-	
 	/* 
-	 * delete the exact dinode under the current directory
-	 * by searching all the nodes below it
+	 * get current dir, then delete the target dinode
+	 * under the current directory by searching all 
+	 * the nodes below it
 	 */
-	int i;
-	for (i=0; i<dir_cur.size; i++) {
-		if (dir_cur.files[i].dino == dinode_no) {
-			dir_cur.size--;
-			dir_cur.files[i] = dir_cur.files[dir_cur.size];
-			/* move the stack-top element to the dead one's
-			 * place
-			 */
-			break; /* stop searching */
-		}
-	}
-
-	/* write back the current dir */
-	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);
-	iput(pinode_cur);	/* release the inode */
-	
-	/* free the block containing the directory */
-	pinode = iget(dinode_no);
+	pinode = iget(cur_dir_dinode_no);
 	struct directory_t dir;
 	fseek(fd, pinode->addr[0] * SBLOCK, 0);
 	fread(&dir, 1, sizeof(dir), fd);
-	bfree(pinode->addr[0]); /* free the #block_no */
+	int i;
+	for (i=0; i<dir.size; i++) {
+		if (dir.files[i].dino == dinode_no) {
+			/* 
+			 * move the stack-top element to the dead one's
+			 * place
+			 */
+			dir.size--;
+			dir.files[i] = dir.files[dir.size];
+			break; /* stop searching */
+		}
+	}
+	/* write back the current dir */
+	fseek(fd, pinode->addr[0] * SBLOCK, 0);
+	fwrite(&dir, 1, sizeof(dir), fd);
+	iput(pinode);	/* release the inode */
+	
+	/* free the block of the target dir */
+	pinode = iget(dinode_no);
+	bfree(pinode->addr[0]);			 /* free the #block_no */
 	iput(pinode);
 
-	/* free the on-disk inode */
+	/* free the target dinode */
 	ifree(dinode_no);
-
+	
+	printf("rmdir ends\n");
 	return;
 }

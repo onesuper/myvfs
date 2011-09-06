@@ -37,11 +37,23 @@
 	|
 	|-- include
 	|   |-- fs.h
-	|   `-- param.h
+	|   |-- param.h
+	|   `-- test.h
 	|
 	|-- init
 	|   `-- init.c
-	|	
+	|
+	|-- test
+	|   |-- test_ls.c
+	|   |-- test_cd.c
+	|   |-- test_mkdir.c
+	|   |-- test_touch.c
+	|   |-- test_rm.c
+	|   |-- test_rmdir.c
+	|   |-- test_open.c
+	|   |-- test_read.c
+	|   `-- test_write.c
+	|
 	|-- install.py
 	|
 	|-- Makefile

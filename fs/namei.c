@@ -27,7 +27,7 @@ unsigned int namei(const char *pathname) {
 	if (strcmp(pathname, "/") == 0) { /* root path */
 		return usr.dino;
 	} else if (strcmp(pathname, ".") == 0) { /* current directory */
-		return cur_dir_inode_no;
+		return cur_dir_dinode_no;
 	} else {
 		/*
 		 * read the dir of current directory

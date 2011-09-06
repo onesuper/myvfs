@@ -5,20 +5,28 @@ CC = gcc
 CFLAGS = -c -fPIC -I. -Wall
 
 
-
-# All Targets
-all: init/init.so fs/fs.so
-
+# All Targets:
+all: init/init.so fs/fs.so test/test_ls
 
 
-#	PART I   
+
+# PART I
+# unit test
+test/test_ls: test/test_ls.o fs/fs.so
+	$(CC) -o test/test_ls test/test_ls.o -shared fs/fs.so
+
+test/test_ls.o: test/test_ls.c
+	$(CC) -o test/test_ls.o test/test_ls.c -c -Wall -I.
+
+# PART II   
 init/init.so: init/init.o
 	$(CC) -o init/init.so -shared init/init.o 
 
 init/init.o: init/init.c
 	$(CC) -o init/init.o $(CFLAGS) init/init.c
 
-#	PART II
+
+# PART III
 # add the objects here:
 OBJECTS = fs/util.o fs/mount.o fs/ialloc.o fs/balloc.o fs/iget.o fs/namei.o fs/sys.o fs/sys2.o 
 
@@ -52,7 +60,9 @@ fs/sys.o: fs/sys.c
 fs/sys2.o: fs/sys2.c
 	$(CC) -o fs/sys2.o $(CFLAGS) fs/sys2.c
 
+
 # clean
 clean:
 	rm -rf init/*.o
 	rm -rf fs/*.o
+	rm -rf test/*.o
