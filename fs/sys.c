@@ -14,26 +14,31 @@
 
 
 /* 
- * list the all the files and child directories
+ * list the all the files and directories
  * under current directory
  *
  */
 void ls(void) {
+
+	printf("ls starts\n");
 	
 	/*
 	 * in order to see what is in the directory entries
-	 * get it via iget(), and then drop it via iput() 
+	 * get it by iget(), and then drop it by iput() 
 	 */
 	struct directory_t dir;
-	struct inode_t* pinode= iget(cur_dir_inode_no);
+	struct inode_t* pinode= iget(cur_dir_dinode_no);
 	fseek(fd, pinode->addr[0] * SBLOCK, 0);
 	fread(&dir, 1, sizeof(dir), fd);
 	iput(pinode);
-
+	
+	/* print */
 	int i;
 	for (i=0; i<dir.size; i++) {
 		printf("%s\t", dir.files[i].name);
 	}
+
+	printf("ls ends\n");
 	return;
 }
 
@@ -43,27 +48,27 @@ void ls(void) {
  *
  */
 void cd(const char* pathname) {
-	int dino_no = namei(pathname);
-
-	if (dino_no == 0) {
+	
+	/*
+	 * get pinode in memory
+	 */
+	int dinode_no = namei(pathname);
+	if (dinode_no == 0) {
 		printf("No such file or directory");
 		return;
 	}
-	
-	struct inode_t* pinode = iget(dino_no);
-
+	struct inode_t* pinode = iget(dinode_no);
 	if (pinode == NULL) {
 		printf("No such file or directory");
 		return;
 	}
-
 	if (pinode->type != 'd') {
 		printf("Not a directory");
 		return;
 	}
-
-	cur_dir_inode_no = dino_no;
 	
+	/* change the cur dir */
+	cur_dir_dinode_no = dinode_no;
 }
 
 /*
@@ -76,69 +81,72 @@ void cd(const char* pathname) {
  */
 void mkdir(const char* pathname) {
 
-	/* if it is ready there */
-	unsigned int dino_no = namei(pathname);
-	if (dino_no != 0) {
+	/* ensure not exist */
+	unsigned int dinode_no = namei(pathname);
+	if (dinode_no != 0) {
 		printf("File or directory exists");
 		return;
 	}
-	
-	/* make a new directory entry */
-	struct directory_t new_dir;
+		
+	/* 
+	 * create a new directory structure
+	 * an empty dir has one entry which 
+	 * represents its upper layer dir
+	 * in this case cur dir
+	 */
+	struct directory_t dir;
+	dir.size = 1;
+	strcpy(dir.files[0].name, "..");
+	dir.files[0].dino = cur_dir_dinode_no;
 
 	/* 
-	 * even a empty dir has a entry which
-	 * represents its upper layer dir, in this case
-	 * cur_dir
+	 * allocate a block and an inode
+	 * which is a atomic operation
 	 */
-	new_dir.size = 1;
-	strcpy(new_dir.files[0].name, "..");
-	new_dir.files[0].dino = cur_dir_inode_no;
-
-	/* alloc a  new block */
 	unsigned int block_no = balloc();  
 	if (block_no == 0)
 		return;	
-
-	/* alloc an new inode */
 	struct inode_t* pinode = ialloc();
 	if (pinode == NULL) {
 		bfree(block_no);  /* rollback~ */
 		return;
 	}
 
-	/* write the directory to the new block */
+	/* 
+	 * write the directory to the block
+	 * and register inode info
+	 */
+	unsigned int new_dinode_no;
 	fseek(fd, block_no * SBLOCK, 0);
-	fwrite(&new_dir, 1, sizeof(new_dir), fd);
-
-	/* register inode information */
-	pinode->size = 1;  /* directory always takes 1 addr */
+	fwrite(&dir, 1, sizeof(dir), fd);
+	pinode->size = 1;				/* new dir's size */
 	pinode->addr[0] = block_no;
 	pinode->type = 'd'; 
-	pinode->mode = '0';				/* ? */
-	block_no = pinode->dino;		/* !!!!!!!!!*/
-	iput(pinode);					/* release inode */
+	pinode->mode = '0';				/* ??? */	
+	new_dinode_no = pinode->dino	/* remember the dino */
+	iput(pinode);					/* release inode after using it */
 
 	/* 
-	 * create a new file binding to the block
+	 * create a file structure to record the 
+	 * dinode_no and the pathname
 	 */
-	struct file_t new_file;
-	strcpy(new_file.name, pathname);
-	new_file.dino = block_no;
+	struct file_t file;
+	strcpy(file.name, pathname);
+	file.dino = new_dinode_no;
 
 	/*
 	 * add the new directory to the cur dir
+	 * which means adding the file to it's files array
 	 */
 	struct directory_t dir_cur;
-	struct inode_t *pinode_cur = iget(cur_dir_inode_no);
-
+	struct inode_t *pinode_cur = iget(cur_dir_dinode_no);
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
 	fread(&dir_cur, 1, sizeof(dir_cur), fd);
-	dir_cur.files[dir_cur.size] = new_file;		/* append to it */
-	dir_cur.size++;
+	dir_cur.files[dir_cur.size] = file;				/* append the file to it */
+	dir_cur.size ++;
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);	/* write back */
-	iput(pinode_cur);			/* release inode */
+	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);		/* write back */
+	iput(pinode_cur);								/* release inode */
 
 	return;
 }
@@ -156,32 +164,33 @@ void mkdir(const char* pathname) {
 void touch(const char* pathname) {
 
 	/* if it is already there */
-	unsigned int dino_no = namei(pathname);
-	if (dino_no != 0) {
+	unsigned int dinode_no = namei(pathname);
+	if (dinode_no != 0) {
 		printf("File or directory exists");
 		return;
 	}
 	
-	/* alloc a new inode */
+	/* 
+	 * create a file using allocated dinode 
+	 * alloc a new inode
+	 */
 	struct inode_t *pinode = ialloc();
 	if (pinode == NULL)
 		return;
 	pinode->size = 0;
 	pinode->type = 'f';
 	pinode->mode = '1';
-
-	/* create a file using the block given by inode */
-	struct file_t new_file;
-	strcpy(new_file.name, pathname);
-	new_file.dino = pinode->dino;
-	iput(pinode); /* release inode */
+	struct file_t file;
+	strcpy(file.name, pathname);
+	file.dino = pinode->dino;
+	iput(pinode);				/* release inode */
 
 	/* add it to the current directory */
 	struct inode_t *pinode_cur = iget(cur_dir_inode_no);
 	struct directory_t dir_cur;
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
 	fread(&dir_cur, 1, sizeof(dir_cur), fd); 
-	dir_cur.files[dir_cur.size] = new_file;
+	dir_cur.files[dir_cur.size] = file;
 	dir_cur.size++;
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
 	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);	/* write back */

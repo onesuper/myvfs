@@ -12,9 +12,8 @@
 #include <stdlib.h>
 
 /*
- * firstly, ialloc() allocates a d_inode
- * secondly, ialloc() calls iget() to get
- * a inode in the memory 
+ * allocate an unused dinode and call
+ * iget() to get a inode in the memory 
  * 
  * return a inode pointer if succeed
  * else return a NULL pointer

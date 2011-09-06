@@ -21,10 +21,10 @@
 struct super_block_t	sb;
 struct inode_p_t		inode_hash_table[NINODE];	/* in-core inode table */
 struct open_file_t		open_file[NOFILE];			/* open-file table */
-unsigned short			o_file_num;				/* num of open file */
-struct user_t			usr;					/* one user in system-root*/
-unsigned int cur_dir_inode_no;		/* the inode no of current directory */ 
-FILE *fd;						/* point to the vfs file*/
+unsigned short			o_file_num;					/* num of open file */
+struct user_t			usr;						/* one user in system-root*/
+unsigned int cur_dir_dinode_no;			/* the dinode no of current directory */ 
+FILE *fd;								/* point to the vfs file*/
 
 
 /* 
@@ -51,7 +51,7 @@ void mount(char* path) {
 	fread(&usr, 1, sizeof(usr), fd);
 
 	/* set the current dir, $1 */
-	cur_dir_inode_no = usr.dino;
+	cur_dir_dinode_no = usr.dino;
 
 	/* read the superblock*/
 	fseek(fd, 1 * SBLOCK, 0);

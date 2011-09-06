@@ -18,8 +18,8 @@
 
 /* bmap */
 struct bmap_t {
-	char			use[49];		/* 1 for used, 0 for free */
-	unsigned int	addr[49];		/* physical address of each block */
+	char			use[50];		/* 1 for used, 0 for free */
+	unsigned int	addr[50];		/* physical address of each block */
 	unsigned short	free_block_num; /* number of free blocks */          
 };
 
@@ -126,7 +126,7 @@ extern struct inode_p_t			inode_hash_table[NINODE];
 extern struct open_file_t		open_file[NOFILE];
 extern unsigned short			o_file_num;
 extern struct user_t			usr;
-extern unsigned int				cur_dir_inode_no;
+extern unsigned int				cur_dir_dinode_no;
 
 /* util.c */
 extern void save_super_block(void);

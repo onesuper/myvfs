@@ -25,22 +25,22 @@
 	|-- doc
 	|
 	|-- fs
-	|	|-- balloc.c
-	|	|-- alloc.c
-	|	|-- iget.c
-	|	|-- mount.c
-	|	|-- namei.c
-	|	|-- sys.c
-	|	|-- sys2.c
-	|	|-- unmount.c
-	|	`-- util.c
+	|   |-- balloc.c
+	|   |-- alloc.c
+	|   |-- iget.c
+	|   |-- mount.c
+	|   |-- namei.c
+	|   |-- sys.c
+	|   |-- sys2.c
+	|   |-- unmount.c
+	|   `-- util.c
 	|
 	|-- include
-	|	|-- fs.h
-	|	`-- param.h
+	|   |-- fs.h
+	|   `-- param.h
 	|
 	|-- init
-	|	`-- init.c
+	|   `-- init.c
 	|	
 	|-- install.py
 	|

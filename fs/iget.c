@@ -60,9 +60,10 @@ struct inode_t* iget(unsigned int dinode_no) {
 
 
 /* 
- * delete a inode and reduce the reference count
+ * reduce the reference count
  */
 void iput(struct inode_t *pinode) {
+
 
 	/*
 	 * if the inode is still referenced by other file
