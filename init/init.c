@@ -49,10 +49,10 @@ void format_fs(char* path, char* pwd) {
 	 */
 	struct bmap_t bmap;
 	int i, j;
-	for (i=NIBLOCK + 2; i<NIBLOCK + NDBLOCK + 1; i+=50) {  /* [402, 1001) */
-		for(j=1; j<50; j++) {	/* [1, 49] */
+	for (i=NIBLOCK + 2; i<NIBLOCK + NDBLOCK + 2; i+=50) {  /* [402, 1002) */
+		for(j=1; j<50; j++) {		/* [1, 49] */
 			bmap.use[j] = 0; 
-			bmap.addr[j] = i + j; /* 1 + 402 = 403, 49 + 402 = 451 */
+			bmap.addr[j] = i + j;	/* 1 + 402 = 403, 49 + 402 = 451 */
 			bmap.free_block_num = 49;
 		}
 		fseek(fd, i * SBLOCK, 0);
@@ -68,14 +68,13 @@ void format_fs(char* path, char* pwd) {
 	 * NOTE: THE DINODE.NO STARTS FROM 1 BUT NOT 0
 	 */
 	struct d_inode_t dinode;
-	dinode.mode = 0;
-	dinode.no = 1;
+	dinode.dino = 1;
 	dinode.size = 0;
-	dinode.type = 'e';  /* empty */
-	for (i=0; i<NIBLOCK * SBLOCK / sizeof(dinode); i++) {		
-		fseek(fd, SBLOCK * 2 + i * sizeof(dinode), 0);		/* the inode block starts at #2 */
+	dinode.type = 'e';											/* write the empty inodes from $1 */
+	for (i=0; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {		
+		fseek(fd, 2 * SBLOCK + i * sizeof(dinode), 0);		/* the dinode starts at #2 */
 		fwrite(&dinode, 1, sizeof(dinode), fd);		
-		dinode.no++;							
+		dinode.dino++;							
 	}
 	printf("on-disk inode done\n");
 
@@ -84,18 +83,16 @@ void format_fs(char* path, char* pwd) {
 	 * write it at $1
 	 */
 	dinode.size = 1;	
-	dinode.mode = 1;					/* ??? */
-	dinode.type = 'd';					/* directory */
-	dinode.dnum = 1;					/* ??? */
-	dinode.addr[0] = NIBLOCK + 2 + 1;	/* #403 */
-	dinode.no = 1;						/* root inode is $1 */
-	fseek(fd, map_addr(dinode.no), 0);
+	dinode.type = 'd';						/* directory */
+	dinode.addr[0] = NIBLOCK + 2 + 1;		/* #403 */
+	dinode.dino = 1;						/* root inode is $1 */
+	fseek(fd, SBLOCK * map_addr(dinode.dino), 0);
 	fwrite(&dinode, 1, sizeof(dinode), fd);
 
 	/* create root dir at #403 */
 	struct directory_t dir;
-	dir.size = 0;						/* nothing in the root dir at first */
-	fseek(fd, SBLOCK * (NIBLOCK + 2 +1), 0);
+	dir.size = 0;				/* nothing in the root dir at first */
+	fseek(fd, SBLOCK * (NIBLOCK + 2 + 1), 0);
 	fwrite(&dir, 1, sizeof(dir), fd);
 	printf("root dir done\n");
 
@@ -140,8 +137,8 @@ void format_fs(char* path, char* pwd) {
  * if the given no is 1, the addr is 2
  * if the given no is x, the addr is 2 + (x - 1) * sizeof(dinode)
  */
-unsigned long map_addr(unsigned int no) {
+unsigned long map_addr(unsigned int dino) {
 	struct d_inode_t dinode;
-	unsigned long addr = 2 + sizeof(dinode) * (no - 1);
+	unsigned long addr = 2 + sizeof(dinode) * (dino - 1);
 	return addr;
 }

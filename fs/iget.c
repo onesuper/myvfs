@@ -17,7 +17,6 @@ struct inode_t* iget(unsigned int dinode_no) {
 
 	struct inode_t* pinode;
 	int key = dinode_no % NINODE;					/* calculate the key */
-
 	/*
 	 * check the inode table first
 	 * if the inode isin the hash table
@@ -39,9 +38,13 @@ struct inode_t* iget(unsigned int dinode_no) {
 	 * if the inode is not in the hash table
 	 * create a new one and add to it
 	 */
-	struct inode_t inode_new;
-	pinode = (struct inode_t*)malloc(sizeof(inode_new));	/* create by malloc() */
-	pinode->dino = dinode_no;								/* record the dinode_no */						
+	struct inode_t inode_temp;
+	struct d_inode_t dinode_temp;
+	pinode = (struct inode_t*)malloc(sizeof(inode_temp));	/* create by malloc() */
+	fseek(fd, map_addr(dinode_no) * SBLOCK, 0);						/* dump dinode info to inode */
+	/*fread(&pinode->align, 1, sizeof(dinode_temp), fd);
+	*/
+	fread(&dinode_temp, 1,sizeof(dinode_temp), fd);
 
 	/* add to hash table */
 	pinode->forward = inode_hash_table[key].forward;

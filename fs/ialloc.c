@@ -46,7 +46,7 @@ struct inode_t *ialloc(void) {
 			/* only empty one can be alloced */
 			if (dinode.type == 'e') {
 				/* stack grows */
-				sb.free_inode_stack[sb.free_inode_sp] = dinode.no;
+				sb.free_inode_stack[sb.free_inode_sp] = dinode.dino;
 				sb.free_inode_sp++;
 				/*
 				 * now change the d_inode's type and write back
@@ -76,9 +76,13 @@ struct inode_t *ialloc(void) {
 	
 	/* 
 	 * call iget() to get the inode's pointer through dinode_no
+	 * dump the inode info to the dinode
 	 * then return it
 	 */
 	struct inode_t* pinode = iget(dinode_no);
+	fseek(fd, map_addr(dinode_no) * SBLOCK, 0);
+	fwrite(&pinode->align, 1, sizeof(dinode), fd);
+
 	return pinode;
 }
 

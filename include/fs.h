@@ -25,12 +25,11 @@ struct bmap_t {
 
 /* on disk inode */
 struct d_inode_t {
-	char			type;		/* 'e'mpty, 's' */
-	unsigned short	dnum;
-	unsigned int	no;
-	unsigned short	mode;		/* 0 for data, 1 for directory */
-	unsigned int	size;
-	unsigned int	addr[50];	/* physical block no */
+	unsigned short  align;			/* align inode */
+	char			type;			/* 'e'mpty, 'd', 'f' */
+	unsigned int	dino;			/* dinode no */
+	unsigned int	size;			/* how many blocks */
+	unsigned int	addr[50];		/* physical block no */
 };
 
 /* super block */
@@ -84,10 +83,12 @@ struct inode_t {
 	struct inode_t* backward;	/* backward inode */
 	unsigned int	count;		/* referece count */
 	unsigned short  flag;		/* updated ?*/
-	char			type;		/* 'f'ile, 'd'irectory */
-	unsigned int	dino;		/* disk inode no */	
+	/* align dinode */
+	unsigned short  align;
+	char			type;		
+	unsigned int	dino;			
 	unsigned int	size;		
-	unsigned int	addr[50];	/* physical block no */
+	unsigned int	addr[50];
 };
 
 /* 

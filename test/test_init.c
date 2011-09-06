@@ -3,7 +3,7 @@
  * Author: onesuper
  * Email: onesuperclark@gmail.com
  *
- * unit test for system call ls
+ * unit test for system call format_fs in init.c
  */
 
 #include <include/fs.h>
@@ -13,9 +13,7 @@
 #include <string.h>
 
 int main() {
-
-	mount("volume1.vfs");
-	picture();
-	printf("test ls\n");
+	printf("test format_fs\n");
+	format_fs("volume1.vfs", "123");
 	return 0;
 }
