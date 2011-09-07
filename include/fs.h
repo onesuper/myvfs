@@ -79,16 +79,16 @@ struct user_t {
 
 /* in core inode */
 struct inode_t {
-	struct inode_t* forward;    /* forward inode */
-	struct inode_t* backward;	/* backward inode */
-	unsigned int	count;		/* referece count */
-	unsigned short  flag;		/* updated ?*/
+	struct inode_t* forward;		/* forward inode */
+	struct inode_t* backward;		/* backward inode */
+	unsigned int	count;			/* referece count */
+	unsigned short  flag;			/* updated ?*/
 	/* align dinode */
-	unsigned short  align;
-	char			type;		
-	unsigned int	dino;			
-	unsigned int	size;		
-	unsigned int	addr[50];
+	unsigned short  align;			/* align inode */
+	char			type;			/* 'e'mpty, 'd', 'f' */
+	unsigned int	dino;			/* dinode no */
+	unsigned int	size;			/* how many blocks */
+	unsigned int	addr[50];		/* physical block no */
 };
 
 /* 
@@ -131,6 +131,7 @@ extern unsigned int				cur_dir_dinode_no;
 /* util.c */
 extern void save_super_block(void);
 extern unsigned long map_addr(unsigned int);
+extern void d_to_inode(struct inode_t* ,unsigned int);
 
 /* alloc.c */
 extern struct inode_t* ialloc(void);

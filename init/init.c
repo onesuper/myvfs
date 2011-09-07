@@ -72,7 +72,7 @@ void format_fs(char* path, char* pwd) {
 	dinode.size = 0;
 	dinode.type = 'e';											/* write the empty inodes from $1 */
 	for (i=0; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {		
-		fseek(fd, 2 * SBLOCK + i * sizeof(dinode), 0);		/* the dinode starts at #2 */
+		fseek(fd, 2 * SBLOCK + i * sizeof(dinode), 0);			/* the dinode starts at #2 */
 		fwrite(&dinode, 1, sizeof(dinode), fd);		
 		dinode.dino++;							
 	}

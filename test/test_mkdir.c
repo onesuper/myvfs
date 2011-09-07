@@ -3,7 +3,7 @@
  * Author: onesuper
  * Email: onesuperclark@gmail.com
  *
- * unit test for system call ls
+ * unit test for system call mkdir
  */
 
 #include <include/fs.h>
@@ -14,8 +14,9 @@
 
 int main() {
 
-	printf("test ls\n");
+	printf("test mkdir\n");
 	mount("volume1.vfs");
+	mkdir("abc");
 	ls();
 	return 0;
 }

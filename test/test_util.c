@@ -24,6 +24,7 @@ void picture(void) {
 	fseek(fd, SBLOCK * 1, 0);  
 	fread(&sb, 1, sizeof(sb), fd);
 	printf("superblock\n");
+	printf("PA: %d\n", SBLOCK * 1);
 	printf("data_block_num: %d\n", sb.data_block_num);
 	printf("inode_block_num: %d\n", sb.inode_block_num);
 	printf("free_block_num: %d\n", sb.free_block_num);
@@ -35,6 +36,7 @@ void picture(void) {
 
 	/* usr */
 	printf("usr\n");
+	printf("PA: %d\n", 0);
 	struct user_t usr;
 	fseek(fd, 0, 0);
 	fread(&usr, 1, sizeof(usr), fd);
@@ -50,6 +52,7 @@ void picture(void) {
 	for (i=0; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {		
 		fseek(fd, 2 * SBLOCK + i * sizeof(dinode), 0);				
 		fread(&dinode, 1, sizeof(dinode), fd);	
+		printf("PA: %d\n", 2 * SBLOCK + i * sizeof(dinode));
 		printf("dino: %d\n", dinode.dino);
 		printf("type: %c\n", dinode.type);
 		printf("addr[0]: %d\n", dinode.addr[0]);
@@ -66,6 +69,8 @@ void picture(void) {
 	for (i=NIBLOCK + 2; i<NIBLOCK + NDBLOCK + 2; i+=50) {  
 		fseek(fd, i * SBLOCK, 0);
 		fread(&bmap, 1, sizeof(bmap), fd);
+		printf("PA: %d\n", SBLOCK * i);
+
 		for(j=1; j<50; j++) {		
 			printf("\t%d ", bmap.use[j]); 
 			printf("%d ", bmap.addr[j]);	
@@ -91,6 +96,21 @@ void watch_dinode(unsigned int dino) {
 	printf("type: %c\n", dinode.type);
 	printf("addr[0]: %d\n", dinode.addr[0]);
 	printf("size: %d\n", dinode.size);
+	printf("----------------------\n");
+	return;
+}
+
+/*
+ * watch a inode on vfs
+ */
+void watch_inode(struct inode_t* pinode) {
+	printf("----------------------\n");
+	printf("count: %d\n", pinode->count);
+	printf("flag: %d\n", pinode->flag);
+	printf("dino: %d\n", pinode->dino);
+	printf("type: %d\n", pinode->type);
+	printf("addr[0]: %d\n", pinode->addr[0]);
+	printf("size: %d\n", pinode->size);
 	printf("----------------------\n");
 	return;
 }
