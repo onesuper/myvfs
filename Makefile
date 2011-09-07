@@ -6,8 +6,7 @@ AUTHOR = onesuper
 CC = gcc
 CFLAGS = -c -fPIC -I. -Wall
 DEBUG = -g	
-OBJECTS = 	fs/util.o	fs/mount.o	fs/ialloc.o	fs/balloc.o \
-			fs/iget.o	fs/namei.o	fs/sys.o	fs/sys2.o 
+OBJECTS = fs/util.o fs/mount.o fs/ialloc.o fs/balloc.o fs/iget.o fs/namei.o fs/sys.o fs/sys2.o 
 TFLAGS = -c -I. -Wall
 TOBJ = test/test_util.o
 
@@ -15,9 +14,9 @@ TOBJ = test/test_util.o
 # ========================================================
 #            ALL
 # ========================================================
-all: init/init.so	fs/fs.so
+all: init/init.so fs/fs.so
 
-test: test/test_ls	test/test_init	test/test_mkdir
+test: test/test_ls test/test_init test/test_mkdir
 
 
 # =========================================================
@@ -104,6 +103,4 @@ clean:
 	rm -rf init/*.o
 	rm -rf fs/*.o
 	rm -rf test/*.o
-	rm test/test_ls
-	rm test/test_init
-	rm test/test_mkdir
+

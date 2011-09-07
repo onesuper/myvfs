@@ -13,8 +13,6 @@
 #include <string.h>
 
 int main() {
-
-	printf("test mkdir\n");
 	mount("volume1.vfs");
 	mkdir("abc");
 	ls();

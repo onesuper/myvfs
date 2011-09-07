@@ -35,7 +35,7 @@ FILE *fd;								/* point to the vfs file*/
 void mount(char* path) {
 
 	/* open the vfs on the disk */
-	fd = fopen(path, "rwb");
+	fd = fopen(path, "r+w+b");
 	if (fd == NULL) {
 		printf("vfs file cannot be opened\n");
 		exit(0);

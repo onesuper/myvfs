@@ -25,8 +25,7 @@ struct bmap_t {
 
 /* on disk inode */
 struct d_inode_t {
-	unsigned short  align;			/* align inode */
-	char			type;			/* 'e'mpty, 'd', 'f' */
+	char			type;			/* 'e'mpty, 'd', 'f', 's' */
 	unsigned int	dino;			/* dinode no */
 	unsigned int	size;			/* how many blocks */
 	unsigned int	addr[50];		/* physical block no */
@@ -83,9 +82,8 @@ struct inode_t {
 	struct inode_t* backward;		/* backward inode */
 	unsigned int	count;			/* referece count */
 	unsigned short  flag;			/* updated ?*/
-	/* align dinode */
-	unsigned short  align;			/* align inode */
-	char			type;			/* 'e'mpty,  */
+	/* dinode */
+	char			type;			
 	unsigned int	dino;			/* dinode no */
 	unsigned int	size;			/* how many blocks */
 	unsigned int	addr[50];		/* physical block no */
@@ -131,7 +129,8 @@ extern unsigned int				cur_dir_dinode_no;
 /* util.c */
 extern void save_super_block(void);
 extern unsigned long map_addr(unsigned int);
-extern void d_to_inode(struct inode_t* ,unsigned int);
+extern void d_to_inode(struct inode_t* , unsigned int);
+extern void i_to_dinode(struct inode_t*, unsigned int);
 
 /* alloc.c */
 extern struct inode_t* ialloc(void);

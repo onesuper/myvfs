@@ -91,7 +91,8 @@ void watch_dinode(unsigned int dino) {
 	printf("----dinode: %d--------\n", dino);
 	struct d_inode_t dinode;
 	fseek(fd, map_addr(dino), 0);				
-	fread(&dinode, 1, sizeof(dinode), fd);	
+	fread(&dinode, 1, sizeof(dinode), fd);
+	printf("PA: %lu\n", map_addr(dino));
 	printf("dino: %d\n", dinode.dino);
 	printf("type: %c\n", dinode.type);
 	printf("addr[0]: %d\n", dinode.addr[0]);

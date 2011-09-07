@@ -71,8 +71,8 @@ void format_fs(char* path, char* pwd) {
 	dinode.dino = 1;
 	dinode.size = 0;
 	dinode.type = 'e';											/* write the empty inodes from $1 */
-	for (i=0; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {		
-		fseek(fd, 2 * SBLOCK + i * sizeof(dinode), 0);			/* the dinode starts at #2 */
+	for (i=1; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {		
+		fseek(fd, map_addr(i), 0);								/* the dinode starts at #2 */
 		fwrite(&dinode, 1, sizeof(dinode), fd);		
 		dinode.dino++;							
 	}
@@ -86,7 +86,7 @@ void format_fs(char* path, char* pwd) {
 	dinode.type = 'd';						/* directory */
 	dinode.addr[0] = NIBLOCK + 2 + 1;		/* #403 */
 	dinode.dino = 1;						/* root inode is $1 */
-	fseek(fd, SBLOCK * map_addr(dinode.dino), 0);
+	fseek(fd, map_addr(dinode.dino), 0);
 	fwrite(&dinode, 1, sizeof(dinode), fd);
 
 	/* create root dir at #403 */
@@ -139,6 +139,6 @@ void format_fs(char* path, char* pwd) {
  */
 unsigned long map_addr(unsigned int dino) {
 	struct d_inode_t dinode;
-	unsigned long addr = 2 + sizeof(dinode) * (dino - 1);
+	unsigned long addr = 2 * SBLOCK + sizeof(dinode) * (dino - 1);
 	return addr;
 }

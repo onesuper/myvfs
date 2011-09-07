@@ -30,7 +30,6 @@ struct inode_t *ialloc(void) {
 	 * if the free node stack is empty,
 	 * search the inode area and find 50 free inodes
 	 */
-	unsigned long addr;
 	int i;
 	int count = 0;
 	char find50 = 0;			/* set only if find 50 inodes */
@@ -39,7 +38,7 @@ struct inode_t *ialloc(void) {
 		/* 
 		 * search the entire inode area until find 50 free inodes
 		 */
-		for (i=0; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {
+		for (i=1; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {
 			fseek(fd, map_addr(i), 0);
 			fread(&dinode, 1, sizeof(dinode), fd);
 			/* only empty one can be alloced */
@@ -50,7 +49,7 @@ struct inode_t *ialloc(void) {
 				/*
 				 * now change the d_inode's type and write back
 				 */
-				dinode.type = 's';			
+				dinode.type = 'u';			
 				fseek(fd, map_addr(i), 0);
 				fwrite(&dinode, 1, sizeof(dinode), fd);
 				count ++;
@@ -78,8 +77,7 @@ struct inode_t *ialloc(void) {
 	 * dump the inode info to the dinode
 	 * then return it
 	 */
-	struct inode_t* pinode = iget(dinode_no);
-	
+	struct inode_t* pinode = iget(dinode_no);	
 	i_to_dinode(pinode, dinode_no);
 
 	return pinode;
