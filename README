@@ -69,13 +69,12 @@ and then left essentailly unchanged".
 The most famous one maybe "namei", which John Lions quipped,
 "it wouldn not win the prize for 'Procedure of the Year'".
 
-The second reason is UNIX is wrote for the PDP11. The
-C code is highly related to the machine. And some parts
-are written in assembly language which is really hard to
-read.
+The second reason is UNIX is wrote for PDP11. The C code
+is highly related to the machine. Some parts are written
+in assembly language which can never be seen today.
 
 If we can make the file system more abstract, things will
-be better. 
+be easier. 
 
 
 == Getting Started

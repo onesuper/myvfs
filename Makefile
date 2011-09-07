@@ -17,7 +17,7 @@ TOBJ = test/test_util.o
 # ========================================================
 all: init/init.so	fs/fs.so
 
-test: test/test_ls test/test_init
+test: test/test_ls	test/test_init	test/test_mkdir
 
 
 # =========================================================
@@ -38,6 +38,14 @@ test/test_ls: test/test_ls.o $(TOBJ)
 
 test/test_ls.o: test/test_ls.c
 	$(CC) -o test/test_ls.o $(TFLAGS) test/test_ls.c $(DEBUG)
+
+
+# test_mkdir
+test/test_mkdir: test/test_mkdir.o $(TOBJ)
+	$(CC) -o test/test_mkdir test/test_mkdir.o $(OBJECTS) $(TOBJ) $(DEBUG)
+
+test/test_mkdir.o: test/test_mkdir.c
+	$(CC) -o test/test_mkdir.o $(TFLAGS) test/test_mkdir.c $(DEBUG)
 
 # test_util 
 $(TOBJ): test/test_util.c
@@ -96,3 +104,6 @@ clean:
 	rm -rf init/*.o
 	rm -rf fs/*.o
 	rm -rf test/*.o
+	rm test/test_ls
+	rm test/test_init
+	rm test/test_mkdir

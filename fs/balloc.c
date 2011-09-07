@@ -39,7 +39,7 @@ unsigned int balloc(void) {
 		char flag = 0;		/* set when 50 elements came in*/
 
 		/* #402 to #1002, 600 / 50 = 12 */
-		for (i=0; i<(NDBLOCK) / 50 ; i++) {
+		for (i=0; i<NDBLOCK / 50 ; i++) {
 			struct bmap_t bmap;
 			/* read the bmap from disk */
 			fseek(fd, SBLOCK * (2 + NIBLOCK + 50 * i), 0);
@@ -69,7 +69,7 @@ unsigned int balloc(void) {
 	}
 
 	/* now allocate the stack-top free block */
-	unsigned int alloc_block_no = sb.free_block_stack[sb.free_block_sp];
+	unsigned int alloc_block_no = sb.free_block_stack[sb.free_block_sp - 1];
 	sb.modified = 0;
 	sb.free_block_num--;
 	sb.free_block_sp--;

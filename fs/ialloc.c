@@ -50,7 +50,7 @@ struct inode_t *ialloc(void) {
 				/*
 				 * now change the d_inode's type and write back
 				 */
-				dinode.type = 's';	/* ??? */
+				dinode.type = 's';			
 				fseek(fd, map_addr(i), 0);
 				fwrite(&dinode, 1, sizeof(dinode), fd);
 				count ++;
@@ -68,7 +68,7 @@ struct inode_t *ialloc(void) {
 	}
 
 	/* allocate the stack-top d_inode and save the super block */
-	unsigned int dinode_no = sb.free_inode_stack[sb.free_inode_sp];
+	unsigned int dinode_no = sb.free_inode_stack[sb.free_inode_sp - 1];
 	sb.free_inode_sp--;
 	sb.free_inode_num--;
 	save_super_block();
@@ -79,8 +79,8 @@ struct inode_t *ialloc(void) {
 	 * then return it
 	 */
 	struct inode_t* pinode = iget(dinode_no);
-	fseek(fd, map_addr(dinode_no), 0);
-	fwrite(&pinode->align, 1, sizeof(dinode), fd);
+	
+	i_to_dinode(pinode, dinode_no);
 
 	return pinode;
 }

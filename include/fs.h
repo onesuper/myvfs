@@ -85,7 +85,7 @@ struct inode_t {
 	unsigned short  flag;			/* updated ?*/
 	/* align dinode */
 	unsigned short  align;			/* align inode */
-	char			type;			/* 'e'mpty, 'd', 'f' */
+	char			type;			/* 'e'mpty,  */
 	unsigned int	dino;			/* dinode no */
 	unsigned int	size;			/* how many blocks */
 	unsigned int	addr[50];		/* physical block no */
