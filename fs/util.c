@@ -30,7 +30,7 @@ void save_super_block() {
  */
 unsigned long map_addr(unsigned int no) {
 	struct d_inode_t dinode;
-	unsigned long addr = 2 + sizeof(dinode) * (no - 1);
+	unsigned long addr = 2 * SBLOCK + sizeof(dinode) * (no - 1);
 	return addr;
 }
 

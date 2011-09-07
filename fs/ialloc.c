@@ -40,8 +40,7 @@ struct inode_t *ialloc(void) {
 		 * search the entire inode area until find 50 free inodes
 		 */
 		for (i=0; i<SBLOCK * NIBLOCK / sizeof(dinode); i++) {
-			addr = map_addr(i);		/* physical addr of d_inode*/
-			fseek(fd, addr, 0);
+			fseek(fd, map_addr(i), 0);
 			fread(&dinode, 1, sizeof(dinode), fd);
 			/* only empty one can be alloced */
 			if (dinode.type == 'e') {
@@ -52,7 +51,7 @@ struct inode_t *ialloc(void) {
 				 * now change the d_inode's type and write back
 				 */
 				dinode.type = 's';	/* ??? */
-				fseek(fd, addr, 0);
+				fseek(fd, map_addr(i), 0);
 				fwrite(&dinode, 1, sizeof(dinode), fd);
 				count ++;
 				if (count == 50) {
@@ -80,7 +79,7 @@ struct inode_t *ialloc(void) {
 	 * then return it
 	 */
 	struct inode_t* pinode = iget(dinode_no);
-	fseek(fd, map_addr(dinode_no) * SBLOCK, 0);
+	fseek(fd, map_addr(dinode_no), 0);
 	fwrite(&pinode->align, 1, sizeof(dinode), fd);
 
 	return pinode;
@@ -90,7 +89,7 @@ struct inode_t *ialloc(void) {
 /*
  * free a inode from disk
  */
-void ifree(unsigned int dino_id) {
+void ifree(unsigned int dinode_no) {
 
 	/* 
 	 * check the stack before push in case
@@ -99,21 +98,20 @@ void ifree(unsigned int dino_id) {
 	 */
 	if (sb.free_inode_sp == 100) {
 		int i;
-		unsigned int id;
-		unsigned int addr;
-		struct d_inode_t dino;
+		unsigned int no;
+		struct d_inode_t dinode;
 		for (i=0; i<50; i++) {
-			id = sb.free_inode_stack[sb.free_inode_sp - 1];
-			addr = map_addr(id);
-			fseek(fd, addr, 0);
-			fread(&dino, 1, sizeof(dino), fd);
-			dino.type = 's';  /* ?? */
-			fwrite(&dino, 1, sizeof(dino), fd);
+			no = sb.free_inode_stack[sb.free_inode_sp - 1];
+			fseek(fd, map_addr(no), 0);
+			fread(&dinode, 1, sizeof(dinode), fd);
+			dinode.type = 's';  /* ?? */
+			fseek(fd, map_addr(no), 0);
+			fwrite(&dinode, 1, sizeof(dinode), fd);
 		}
 	}
 	
 	/* push the released d_inode to the free_inode_stack */
-	sb.free_inode_stack[sb.free_inode_sp] = dino_id;
+	sb.free_inode_stack[sb.free_inode_sp] = dinode_no;
 	sb.free_inode_sp++;
 	sb.free_inode_num++;
 	return;

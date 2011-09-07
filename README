@@ -1,8 +1,84 @@
 == myvfs 0.1.0
 
+< What It Is >
+
+Myvfs is a virtual file system to show how a file
+system is implemented. In other word, how the os
+manage its disk.
+
+Myvfs can be seemed as a child of UNIX's file system.
+Because it uses most of UNIX's concept ,such as 'inode',
+which originally comes from the UNIX's world.
+
+But it is a quite simple one. The only knowledge required
+to understand it is C language. So you can focus on the
+implement of underlying data structures in most of the
+time.
+
+It mainly consists of two parts: main data structures
+and system calls are defined in the core layer. This 
+part is written in C. A shell in charge of calling
+them and deal with the interactive stuff is written in
+Python.
+
+With Python you can add other features easily. If you
+want to make your file system a C-S model, no more than
+twenty lines of socket is needed.
+
+Myvfs also provides a test framework to test procedure
+in a more clear way.
 
 
-== Getting Started			
+< Is Not >
+
+Myvfs is not a real file system which is often asked
+for quickness, efficiency and reliablity. On the cont-
+rary, it is more like a cookbook to read or a toy to
+play with. So the conciseness and readability are more
+important factors.
+
+I have heard a thousand of times that Unix's file system
+is already simple. However, I think it is simple to a
+mordern operating system, but not simple enough to a 
+textbook for students to learn. I have two reasons.
+
+Like the way people learn the compiler construction. 
+Fisrt they take several theory courses on linguistics
+and optimization. Then they go home and implement 
+their own one. 
+
+So a syntax called PL/0 is popular in courses through
+out the world. Because it is rather easy for students to 
+write a recursive descent parser for such a simple syntax.
+
+This is the only way they will not lose interest in the
+early stage and work out the prototype as soon as possible. 
+
+As long as the 0.1 version is done, the 2.0 version is
+visible. Student can improve it with advanced features
+like parameter passing to procedures or data structures
+like arrays, strings or floating point numbers.
+
+The same thought can be seen in software development. 
+
+Premature optimization is harmful, but we could see 
+them a lot in UNIX's source code. Many procedures have
+been written very early - "to have been throughly debugged 
+and then left essentailly unchanged".
+
+The most famous one maybe "namei", which John Lions quipped,
+"it wouldn not win the prize for 'Procedure of the Year'".
+
+The second reason is UNIX is wrote for the PDP11. The
+C code is highly related to the machine. And some parts
+are written in assembly language which is really hard to
+read.
+
+If we can make the file system more abstract, things will
+be better. 
+
+
+== Getting Started
 
 1. Compile the source code:			
 	$make
@@ -26,7 +102,7 @@
 	|
 	|-- fs
 	|   |-- balloc.c
-	|   |-- alloc.c
+	|   |-- ialloc.c
 	|   |-- iget.c
 	|   |-- mount.c
 	|   |-- namei.c
@@ -44,6 +120,7 @@
 	|   `-- init.c
 	|
 	|-- test
+	|   |-- test_util.c
 	|   |-- test_ls.c
 	|   |-- test_cd.c
 	|   |-- test_mkdir.c
@@ -64,4 +141,23 @@
 	|
 	`-- volume1.vfs
 
+== Use of the Test Framework
 
+1. Compile the test framework:
+	$make test
+
+2. Change to the dir:
+	$cd test
+
+3. Use clewn 6.2 to debug test_ls.c:
+	$clewn -va test_ls.c
+	(gdb)
+
+4. Type 'file XX' to specify the executable file:
+	(gdb) file test_ls
+
+5. Now you can use any commands in gdb like:
+	(gdb) b 16
+
+6. Get help from the framework like
+	watch_dinode()

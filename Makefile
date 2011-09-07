@@ -9,9 +9,11 @@ DEBUG = -g
 OBJECTS = 	fs/util.o	fs/mount.o	fs/ialloc.o	fs/balloc.o \
 			fs/iget.o	fs/namei.o	fs/sys.o	fs/sys2.o 
 TFLAGS = -c -I. -Wall
-TOOL = test/test_tool.o
+TOBJ = test/test_util.o
+
+
 # ========================================================
-#   ALL
+#            ALL
 # ========================================================
 all: init/init.so	fs/fs.so
 
@@ -31,15 +33,17 @@ test/test_init.o: test/test_init.c
 
 
 # test_ls 
-test/test_ls: test/test_ls.o $(TOOL)
-	$(CC) -o test/test_ls test/test_ls.o $(OBJECTS) $(TOOL) $(DEBUG)
+test/test_ls: test/test_ls.o $(TOBJ)
+	$(CC) -o test/test_ls test/test_ls.o $(OBJECTS) $(TOBJ) $(DEBUG)
 
 test/test_ls.o: test/test_ls.c
 	$(CC) -o test/test_ls.o $(TFLAGS) test/test_ls.c $(DEBUG)
 
-# test_tool 
-$(TOOL): test/test_tool.c
-	$(CC) -o $(TOOL) $(TFLAGS) test/test_tool.c $(DEBUG)
+# test_util 
+$(TOBJ): test/test_util.c
+	$(CC) -o $(TOBJ) $(TFLAGS) test/test_util.c $(DEBUG)
+
+
 
 # ======================================================
 #    init.so

@@ -41,7 +41,7 @@ struct inode_t* iget(unsigned int dinode_no) {
 	struct inode_t inode_temp;
 	struct d_inode_t dinode_temp;
 	pinode = (struct inode_t*)malloc(sizeof(inode_temp));	/* create by malloc() */
-	fseek(fd, map_addr(dinode_no) * SBLOCK, 0);						/* dump dinode info to inode */
+	fseek(fd, map_addr(dinode_no), 0);						/* dump dinode info to inode */
 	/*fread(&pinode->align, 1, sizeof(dinode_temp), fd);
 	*/
 	fread(&dinode_temp, 1,sizeof(dinode_temp), fd);

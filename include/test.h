@@ -15,4 +15,4 @@ extern void touch(const char*);
 extern void rm(const char*);
 extern void rmdir(const char*);
 extern void picture(void);
-
+extern void watch_dinode(unsigned int);
