@@ -10,22 +10,48 @@ Because it uses most of UNIX's concept ,such as 'inode',
 which originally comes from the UNIX's family.
 
 But it is a quite simple one. The only knowledge required
-to understand it is C language. So you can focus on the
-implement of underlying data structures in most of the time.
-And you don't bother to know any about the hardware because
-it is virtual.
+is probably C language. So you can focus on the implement-
+ation of underlying data structures in most of the time 
+and don't bother to talk to the hardware because it is not
+a real file system at all.
 
-It mainly consists of two parts: main data structures and
-system calls are defined in the core layer. This part is
-written in C. A shell in charge of calling them and deal
-with the interactive stuff is written in Python.
+Myvfs uses a file to play as a device and communicate with 
+the real file system with fwrite() and fread() - two library
+functions of C.
 
-With Python you can add other features easily. If you want
-to make your file system a C-S model, no more than twelve
-lines of socket is needed.
+There are two layers: core and shell. Main data structures 
+and procedures are defined in core layer. This part is 
+written in C.
 
-Myvfs also provides a test framework to test procedure in
-a clear way.
+Shell layer calls the APIs provided by the core layer and
+deal with the interactive stuffs, which is written in Python.
+
+The system looks like:
+
+         
+Python            shell           
+         =====================	   -+
+           cd ls mkdir touch        |
+ API        rmdir open rm           |
+            open write read         |   virtual file sysetm     
+         ---------------------      |        
+  C               core              |
+         =====================     -+
+c lib        fread  fwrite      
+         ---------------------
+          Linux's file system
+         ---------------------
+		      real device
+
+
+With Python one can add other features easily and make the
+shell look great. For example, if you want to make your file
+system a C-S model, no more than twenty lines of socket is
+needed. 
+
+To make the program easy to debug, myvfs provides a test
+framework to test procedure in a more clear way. (See 'Use
+of the Test Framework')
 
 
 -Is Not
@@ -67,10 +93,11 @@ very early and throughly debugged and then left unchanged.
 The most famous one maybe "namei", which John Lions quipped
 as "it wouldn not win the prize for 'Procedure of the Year'".
 
-The second reason is UNIX is wrote for PDP11. The C code is
-always highly related to the machine. Some parts are written
-in assembly language which can never be seen today.If we can
-make the file system more abstract, things will be easier. 
+The second reason is UNIX is wrote for PDP11. The C language
+is always highly related to the machine. Some parts are even
+written in assembly language which can never be seen today.
+If we can make the file system more abstract, things will be
+easier.
 
 
 == Getting Started
@@ -97,12 +124,7 @@ make the file system more abstract, things will be easier.
   |   |-- balloc.c
   |   |-- ialloc.c
   |   |-- iget.c
-  |   |-- mount.c
-  |   |-- namei.c
-  |   |-- sys.c
-  |   |-- sys2.c
-  |   |-- unmount.c
-  |   |-- util.c
+  |   |-- ...
   |   `-- fs.so
   |
   |-- include
@@ -156,17 +178,19 @@ intall.py
   A Python script for installing vfs.
 
 Makefile
-  GNU Make 3.82 or above is needed
+  GNU Make 3.82 or above is needed.
 
 myvfs.py
-  Shell of vfs which use Python's Cmd Module.
+  The shell of myvfs.
 
 volume1.vfs
-  1MB file for the file sytem.
+  The virtual device.
 
 	
 
 == Use of the Test Framework
+
+If you want to test the procedure ls():
 
 1. Compile the test framework:
   $make test_ls
