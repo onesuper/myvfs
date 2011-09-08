@@ -41,9 +41,14 @@ struct inode_t* iget(unsigned int dinode_no) {
 	pinode = (struct inode_t*)malloc(sizeof(struct inode_t));	/* create by malloc() */
 	d_to_inode(pinode, dinode_no);
 
-	/* add to hash table */
+	/* 
+	 * add to hash table
+	 * 
+	 * [key]<-->[new]<-->[inode]
+	 * [key]<-->[new]
+	 */
 	pinode->forward = inode_hash_table[key].forward;
-	pinode->backward = pinode;
+	pinode->backward = &inode_hash_table[key];		
 	if (pinode->forward != NULL) {
 		pinode->forward->backward = pinode;
 	}

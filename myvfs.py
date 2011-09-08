@@ -28,6 +28,7 @@ import cmd
 def quit_quietly():
 	'''unmount the vfs
 	'''
+	fs.umount()
 	sys.exit()
 
 def check_pathname(pathname):
@@ -61,7 +62,7 @@ Type "help" or "?" for more information.'''
 	commands
 	'''
 	def do_exit(self, path):
-		print 'exit'
+		quit_quietly()
 
 	def do_ls(self, path):
 		fs.ls()
@@ -181,6 +182,3 @@ if __name__ == "__main__":
 	# start command line loop
 	sh = Shell()
 	sh.cmdloop()
-
-	
-

@@ -8,7 +8,7 @@ CFLAGS = -c -fPIC -I. -Wall
 DEBUG = -g	
 OBJECTS = fs/util.o fs/mount.o fs/ialloc.o fs/balloc.o fs/iget.o fs/namei.o fs/sys.o fs/sys2.o 
 TFLAGS = -c -I. -Wall
-TOBJ = test/test_util.o
+TUTIL = test/test_util.o
 
 
 # ========================================================
@@ -24,31 +24,31 @@ test: test/test_ls test/test_init test/test_mkdir
 # =========================================================
 
 # test_init 
-test/test_init: test/test_init.o init/init.o
-	$(CC) -o test/test_init test/test_init.o init/init.o $(DEBUG)
+test/test_init: test/test_init.o init/init.o $(TUTIL)
+	$(CC) -o test/test_init test/test_init.o init/init.o $(TUTIL) $(DEBUG)
 
 test/test_init.o: test/test_init.c
 	$(CC) -o test/test_init.o $(TFLAGS) test/test_init.c $(DEBUG)
 
 
 # test_ls 
-test/test_ls: test/test_ls.o $(TOBJ)
-	$(CC) -o test/test_ls test/test_ls.o $(OBJECTS) $(TOBJ) $(DEBUG)
+test/test_ls: test/test_ls.o $(TUTIL)
+	$(CC) -o test/test_ls test/test_ls.o $(OBJECTS) $(TUTIL) $(DEBUG)
 
 test/test_ls.o: test/test_ls.c
 	$(CC) -o test/test_ls.o $(TFLAGS) test/test_ls.c $(DEBUG)
 
 
 # test_mkdir
-test/test_mkdir: test/test_mkdir.o $(TOBJ)
-	$(CC) -o test/test_mkdir test/test_mkdir.o $(OBJECTS) $(TOBJ) $(DEBUG)
+test/test_mkdir: test/test_mkdir.o $(TUTIL)
+	$(CC) -o test/test_mkdir test/test_mkdir.o $(OBJECTS) $(TUTIL) $(DEBUG)
 
 test/test_mkdir.o: test/test_mkdir.c
 	$(CC) -o test/test_mkdir.o $(TFLAGS) test/test_mkdir.c $(DEBUG)
 
 # test_util 
-$(TOBJ): test/test_util.c
-	$(CC) -o $(TOBJ) $(TFLAGS) test/test_util.c $(DEBUG)
+$(TUTIL): test/test_util.c
+	$(CC) -o $(TUTIL) $(TFLAGS) test/test_util.c $(DEBUG)
 
 
 

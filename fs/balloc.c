@@ -38,7 +38,7 @@ unsigned int balloc(void) {
 		int count = 0;
 		char flag = 0;		/* set when 50 elements came in*/
 
-		/* #402 to #1002, 600 / 50 = 12 */
+		/* [402, 1002)  600 / 50 = 12 */
 		for (i=0; i<NDBLOCK / 50 ; i++) {
 			struct bmap_t bmap;
 			/* read the bmap from disk */
@@ -48,10 +48,11 @@ unsigned int balloc(void) {
 			for (j=1; j<50; j++) {
 				if (bmap.use[j] == 0) { /* if free */
 					bmap.use[j] = 1;
+					bmap.free_block_num --;
 					/* push into the stack */ 
 					sb.free_block_stack[sb.free_block_sp] = bmap.addr[j];
-					sb.free_block_sp++;
-					sb.free_block_num--;
+					sb.free_block_sp ++;
+					sb.free_block_num --;
 					count++;
 					/* 50 elements is enough */
 					if (count == 50) {
@@ -61,7 +62,7 @@ unsigned int balloc(void) {
 				}
 			}
 			/* alter the bitmaps */
-			fseek(fd, 2 + SBLOCK * 50 * i, 0);
+			fseek(fd, SBLOCK * (2 + NIBLOCK + 50 * i), 0);
 			fwrite(&bmap, 1, sizeof(bmap), fd);
 			if (flag == 1)
 				break;

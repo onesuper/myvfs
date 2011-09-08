@@ -70,11 +70,10 @@ void picture(void) {
 		fseek(fd, i * SBLOCK, 0);
 		fread(&bmap, 1, sizeof(bmap), fd);
 		printf("PA: %d\n", SBLOCK * i);
-
+		printf("free: %d\n", bmap.free_block_num);
 		for(j=1; j<50; j++) {		
 			printf("\t%d ", bmap.use[j]); 
 			printf("%d ", bmap.addr[j]);	
-			printf("%d ", bmap.free_block_num = 49);
 		}
 		printf("\n-------------------------------------------------------------------\n");
 	}
@@ -109,9 +108,21 @@ void watch_inode(struct inode_t* pinode) {
 	printf("count: %d\n", pinode->count);
 	printf("flag: %d\n", pinode->flag);
 	printf("dino: %d\n", pinode->dino);
-	printf("type: %d\n", pinode->type);
+	printf("type: %c\n", pinode->type);
 	printf("addr[0]: %d\n", pinode->addr[0]);
 	printf("size: %d\n", pinode->size);
 	printf("----------------------\n");
 	return;
+}
+
+void watch_usr(void) {
+	printf("usr\n");
+	printf("PA: %d\n", 0);
+	struct user_t usr;
+	fseek(fd, 0, 0);
+	fread(&usr, 1, sizeof(usr), fd);
+	printf("name: %s\n", usr.name);
+	printf("password: %s\n", usr.password);
+	printf("dino: %d\n", usr.dino);
+	printf("============================================\n");
 }

@@ -5,3 +5,7 @@
  *
  */
 
+void umount(void) {
+	fclose(fd);
+}
+

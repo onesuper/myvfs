@@ -13,8 +13,10 @@
 #include <string.h>
 
 int main() {
-	mount("volume1.vfs");
-	mkdir("abc");
+	mount("volume2.vfs");
 	ls();
+	mkdir("efg");
+	ls();
+	umount();
 	return 0;
 }

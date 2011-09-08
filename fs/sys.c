@@ -19,8 +19,6 @@
  */
 void ls(void) {
 
-	printf("ls starts\n");
-	
 	/*
 	 * in order to see what is in the directory entries
 	 * get it by iget(), and then drop it by iput() 
@@ -40,9 +38,13 @@ void ls(void) {
 	int i;
 	for (i=0; i<dir.size; i++) {
 		printf("%s\t", dir.files[i].name);
+		if (((i + 1) % 5) == 0)
+			printf("\n");
 	}
+	/* look better */
+	if ((dir.size % 5) != 0)
+		printf("\n");
 
-	printf("ls ends\n");
 	return;
 }
 
@@ -53,7 +55,6 @@ void ls(void) {
  */
 void cd(const char* pathname) {
 	
-	printf("cd starts\n");
 	/*
 	 * get pinode in memory
 	 */
@@ -75,7 +76,6 @@ void cd(const char* pathname) {
 	/* change the cur dir */
 	cur_dir_dinode_no = dinode_no;
 
-	printf("cd ends\n");
 	return;
 }
 
@@ -89,7 +89,6 @@ void cd(const char* pathname) {
  */
 void mkdir(const char* pathname) {
 	
-	printf("mkdir starts\n");
 	/* ensure not exist */
 	unsigned int dinode_no = namei(pathname);
 	if (dinode_no != 0) {
@@ -153,10 +152,9 @@ void mkdir(const char* pathname) {
 	dir_cur.files[dir_cur.size] = file;				/* append the file to it */
 	dir_cur.size ++;
 	fseek(fd, pinode_cur->addr[0] * SBLOCK, 0);
-	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);		/* write back */
+	fwrite(&dir_cur, 1, sizeof(dir_cur), fd);		/* write back the dir to block*/
 	iput(pinode_cur);								/* release inode */
 
-	printf("mkdir ends\n");
 	return;
 }
 
@@ -170,8 +168,6 @@ void mkdir(const char* pathname) {
  *
  */
 void touch(const char* pathname) {
-
-	printf("touch starts\n");
 
 	/* ensure not exist */
 	unsigned int dinode_no = namei(pathname);
@@ -205,7 +201,6 @@ void touch(const char* pathname) {
 	fwrite(&dir, 1, sizeof(dir), fd);		/* write back */
 	iput(pinode);							/* release inode */
 
-	printf("touch ends\n");
 	return;
 }
 
@@ -214,7 +209,6 @@ void touch(const char* pathname) {
  */
 void rm(const char* pathname) {
 
-	printf("rm starts\n");
 
 	/* ensure present */
 	unsigned int dinode_no = namei(pathname);
@@ -278,7 +272,6 @@ void rm(const char* pathname) {
 	/*  finally free the d_inode  */
 	ifree(dinode_no);
 	
-	printf("rm ends\n");
 	return;
 }
 
@@ -286,8 +279,6 @@ void rm(const char* pathname) {
  * remove a directory from the vfs
  */
 void rmdir(const char* pathname) {
-
-	printf("rmdir starts\n");
 
 	/* refuse to remove the root dir */
 	if (strcmp("/", pathname))
@@ -343,6 +334,5 @@ void rmdir(const char* pathname) {
 	/* free the target dinode */
 	ifree(dinode_no);
 	
-	printf("rmdir ends\n");
 	return;
 }

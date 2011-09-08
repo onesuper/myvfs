@@ -14,6 +14,6 @@
 
 int main() {
 	printf("test format_fs\n");
-	format_fs("volume1.vfs", "123");
+	format_fs("volume2.vfs", "123");
 	return 0;
 }

@@ -15,7 +15,8 @@
 int main() {
 
 	printf("test ls\n");
-	mount("volume1.vfs");
+	mount("volume2.vfs");
 	ls();
+	umount();
 	return 0;
 }
