@@ -1,197 +1,188 @@
 == myvfs 0.1.0
 
-< What It Is >
+-What It Is
 
-Myvfs is a virtual file system to show how a file
-system is implemented. In other word, how the os
-manage its disk.
+Myvfs is a virtual file system to show how a file system
+is implemented. In other word, how the os manage its disk.
 
 Myvfs can be seemed as a child of UNIX's file system.
 Because it uses most of UNIX's concept ,such as 'inode',
-which originally comes from the UNIX's world.
+which originally comes from the UNIX's family.
 
 But it is a quite simple one. The only knowledge required
 to understand it is C language. So you can focus on the
-implement of underlying data structures in most of the
-time.
+implement of underlying data structures in most of the time.
+And you don't bother to know any about the hardware because
+it is virtual.
 
-It mainly consists of two parts: main data structures
-and system calls are defined in the core layer. This 
-part is written in C. A shell in charge of calling
-them and deal with the interactive stuff is written in
-Python.
+It mainly consists of two parts: main data structures and
+system calls are defined in the core layer. This part is
+written in C. A shell in charge of calling them and deal
+with the interactive stuff is written in Python.
 
-With Python you can add other features easily. If you
-want to make your file system a C-S model, no more than
-twenty lines of socket is needed.
+With Python you can add other features easily. If you want
+to make your file system a C-S model, no more than twelve
+lines of socket is needed.
 
-Myvfs also provides a test framework to test procedure
-in a more clear way.
+Myvfs also provides a test framework to test procedure in
+a clear way.
 
 
-< Is Not >
+-Is Not
 
-Myvfs is not a real file system which is often asked
-for quickness, efficiency and reliablity. On the cont-
-rary, it is more like a cookbook to read or a toy to
-play with. So the conciseness and readability are more
-important factors.
+Myvfs is not a real file system which is often asked for
+quickness, efficiency and reliablity. On the contrary, it
+is more like a cookbook to read or a toy to play with. So
+the conciseness and readability are more important factors.
 
 I have heard a thousand of times that Unix's file system
-is already simple. However, I think it is simple to a
-mordern operating system, but not simple enough to a 
-textbook for students to learn. I have two reasons.
+is already simple. However, I think it is simple to a mor-
+dern operating system, but not simple enough to a textbook
+for students to learn. I have two reasons.
 
-Like the way people learn the compiler construction. 
-Fisrt they take several theory courses on linguistics
-and optimization. Then they go home and implement 
-their own one. 
+Like the way people learn the compiler construction. Fisrt
+they take several theory courses on linguistics and optim-
+ization. Then they go home and implement their own one. 
 
-So a syntax called PL/0 is popular in courses through
-out the world. Because it is rather easy for students to 
-write a recursive descent parser for such a simple syntax.
+So a syntax called PL/0 is popular in courses through out
+the world. Because it is rather easy for students to write
+a recursive descent parser for such a simple syntax.
 
-This is the only way they will not lose interest in the
-early stage and work out the prototype as soon as possible. 
+This is the only way they will not lose their interest in
+the early stage and work out the prototype as soon as
+possible. 
 
-As long as the 0.1 version is done, the 2.0 version is
-visible. Student can improve it with advanced features
-like parameter passing to procedures or data structures
-like arrays, strings or floating point numbers.
+As long as the 0.1 version is done, the 2.0 version is vis-
+ible. Student can improve it with advanced features like
+parameter passing to procedures or data structures like
+arrays, strings or floating point numbers.
 
-The same thought can be seen in software development. 
+The same thought can be seen in software development. So
+'agile' seems to be the hotest word in recent years.
 
-Premature optimization is harmful, but we could see 
-them a lot in UNIX's source code. Many procedures have
-been written very early - "to have been throughly debugged 
-and then left essentailly unchanged".
+Premature optimization is harmful, but we could see them a
+lot in UNIX's source code. Many procedures have been written
+very early and throughly debugged and then left unchanged.
 
-The most famous one maybe "namei", which John Lions quipped,
-"it wouldn not win the prize for 'Procedure of the Year'".
+The most famous one maybe "namei", which John Lions quipped
+as "it wouldn not win the prize for 'Procedure of the Year'".
 
-The second reason is UNIX is wrote for PDP11. The C code
-is highly related to the machine. Some parts are written
-in assembly language which can never be seen today.
-
-If we can make the file system more abstract, things will
-be easier. 
+The second reason is UNIX is wrote for PDP11. The C code is
+always highly related to the machine. Some parts are written
+in assembly language which can never be seen today.If we can
+make the file system more abstract, things will be easier. 
 
 
 == Getting Started
 
 1. Compile the source code:			
-	$make
+  $make
 
 2. Install the vfs on your disk:
-	$python install.py
+  $python install.py
 
 3. Run the shell to access to the vfs:
-	$python shell.py
-	myvfs 0.1
-	Type "help" or "man" for more information.
-	>>> 
+  $python shell.py
+  myvfs 0.1
+  Type "help" or "man" for more information.
+  >>> 
 
 4. Type 'help' to get help:
-	>>> help
+  >>> help
 
 
 == Description of Contents
 	
-	|-- fs
-	|   |-- balloc.c
-	|   |-- ialloc.c
-	|   |-- iget.c
-	|   |-- mount.c
-	|   |-- namei.c
-	|   |-- sys.c
-	|   |-- sys2.c
-	|   |-- unmount.c
-	|   |-- util.c
-	|   `-- fs.so
-	|
-	|-- include
-	|   |-- fs.h
-	|   |-- param.h
-	|   `-- test.h
-	|
-	|-- init
-	|   |-- init.c
-	|   `-- init.so
-	|
-	|-- test
-	|   |-- test_util.c
-	|   |-- test_ls.c
-	|   |-- test_cd.c
-	|   |-- test_mkdir.c
-	|   |-- test_touch.c
-	|   |-- test_rm.c
-	|   |-- test_rmdir.c
-	|   |-- test_open.c
-	|   |-- test_read.c
-	|   |-- test_write.c
-	|   `-- volume2.vfs
-	|
-	|-- install.py
-	|
-	|-- Makefile
-	|
-	|-- myvfs.py
-	|
-	`-- volume1.vfs
+  |-- fs
+  |   |-- balloc.c
+  |   |-- ialloc.c
+  |   |-- iget.c
+  |   |-- mount.c
+  |   |-- namei.c
+  |   |-- sys.c
+  |   |-- sys2.c
+  |   |-- unmount.c
+  |   |-- util.c
+  |   `-- fs.so
+  |
+  |-- include
+  |   |-- fs.h
+  |   |-- param.h
+  |   `-- test.h
+  |
+  |-- init
+  |   |-- init.c
+  |   `-- init.so
+  |
+  |-- test
+  |   |-- test_util.c
+  |   |-- test_ls.c
+  |   |-- test_cd.c
+  |   |-- test_mkdir.c
+  |   |-- ...
+  |   `-- volume2.vfs
+  |
+  |-- install.py
+  |
+  |-- Makefile
+  |
+  |-- myvfs.py
+  |
+  `-- volume1.vfs
 
 fs
-	The core part of the file system. All the source code of
-	system calls and procedures are in this folder. They are
-	linked into a dynamic link library (fs.so) which can be
-	directly called in myvfs.py.
+  The core part of the file system. All the source code of
+  system calls and procedures are in this folder. They are
+  linked into a dynamic link library (fs.so) which can be
+  directly called in myvfs.py.
 
 include
-	C header files of the file system (fs.h), testing framework
-	(test.h) and the constants (param.h).
+  C header files of the file system (fs.h), testing framework
+  (test.h) and the constants (param.h).
 
 init
-	This file is involved with the initialization when the file
-	system is fisrt time installed to the computer. Also it
-	provides a shared library (init.so) to call it from outside.
+  This file is involved with the initialization when the file
+  system is fisrt time installed to the computer. Also it
+  provides a shared library (init.so) to call it from outside.
 
 test
-	The testing framework file. The file test_utils.c defines
-	some useful procedures which can be used to watch the state
-	of vfs when debugging. The other source file is for unit test.
-	For example, test_mkdir.c tests the mkdir system call of
-	vfs. It is better than testing everything in one file.
+  The testing framework file. The file test_utils.c defines
+  some useful procedures which can be used to watch the state
+  of vfs when debugging. The other source file is for unit
+  test. For example, test_mkdir.c tests the mkdir system call
+  of vfs. It is better than testing everything in one file.
 
 intall.py
-	A Python script for installing vfs.
+  A Python script for installing vfs.
 
 Makefile
-	GNU Make 3.82 or above is needed
+  GNU Make 3.82 or above is needed
 
 myvfs.py
-	Shell of vfs which use Python's Cmd Module.
+  Shell of vfs which use Python's Cmd Module.
 
 volume1.vfs
-	1MB file for the file sytem.
+  1MB file for the file sytem.
 
 	
 
 == Use of the Test Framework
 
 1. Compile the test framework:
-	$make test
+  $make test_ls
 
 2. Change to the dir:
-	$cd test
+  $cd test
 
 3. Use clewn 6.2 to debug test_ls.c:
-	$clewn -va test_ls.c
-	(gdb)
+  $clewn -va test_ls.c
+  (gdb)
 
 4. Type 'file XX' to specify the executable file:
-	(gdb) file test_ls
+  (gdb) file test_ls
 
 5. Type any commands in gdb like:
-	(gdb) b 16
+  (gdb) b 16
 
 6. Use the utils provided by the framework:
-	(gdb) watch_dinode()
+  (gdb) watch_dinode()

@@ -14,9 +14,11 @@ TUTIL = test/test_util.o
 # ========================================================
 #            ALL
 # ========================================================
-all: init/init.so fs/fs.so
-
-test: test/test_ls test/test_init test/test_mkdir
+all: 		init/init.so fs/fs.so
+test_ls: 	test/test_ls
+test_init: 	test/test_init
+test_mkdir:	test/test_mkdir
+test_cd: 	test/test_cd
 
 
 # =========================================================
@@ -45,6 +47,15 @@ test/test_mkdir: test/test_mkdir.o $(TUTIL)
 
 test/test_mkdir.o: test/test_mkdir.c
 	$(CC) -o test/test_mkdir.o $(TFLAGS) test/test_mkdir.c $(DEBUG)
+
+
+# test_cd
+test/test_cd: test/test_cd.o $(TUTIL)
+	$(CC) -o test/test_cd test/test_cd.o $(OBJECTS) $(TUTIL) $(DEBUG)
+
+test/test_cd.o: test/test_cd.c
+	$(CC) -o test/test_cd.o $(TFLAGS) test/test_cd.c $(DEBUG)
+
 
 # test_util 
 $(TUTIL): test/test_util.c

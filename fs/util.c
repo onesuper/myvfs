@@ -64,13 +64,14 @@ void d_to_inode(struct inode_t *pinode, unsigned int dino) {
  * copy a inode to dinode
  */
 
-void i_to_dinode(struct inode_t *pinode, unsigned int dino) {
+void i_to_dinode(struct inode_t *pinode) {
+	unsigned int dino = pinode->dino;
 	struct d_inode_t dinode;
 	dinode.type = pinode->type;
 	dinode.size = pinode->size;
-	dinode.dino = pinode->dino;
+	dinode.dino = dino;
 	int i;
-	for(i=0; i>50; i++) {
+	for(i=0; i<50; i++) {
 		dinode.addr[i] = pinode->addr[i];
 	}
 	fseek(fd, map_addr(dino), 0);

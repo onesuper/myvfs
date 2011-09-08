@@ -78,7 +78,7 @@ struct inode_t *ialloc(void) {
 	 * then return it
 	 */
 	struct inode_t* pinode = iget(dinode_no);	
-	i_to_dinode(pinode, dinode_no);
+	i_to_dinode(pinode);
 
 	return pinode;
 }

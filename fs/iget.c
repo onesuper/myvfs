@@ -76,6 +76,11 @@ void iput(struct inode_t *pinode) {
 		pinode->count--;
 		return;
 	}
+	
+	/*
+	 * store the inode to the disk first
+	 */
+	i_to_dinode(pinode);
 
 	/*
 	 * else the inode must be removed from the hash table

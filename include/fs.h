@@ -124,7 +124,7 @@ extern unsigned int				cur_dir_dinode_no;
 extern void save_super_block(void);
 extern unsigned long map_addr(unsigned int);
 extern void d_to_inode(struct inode_t* , unsigned int);
-extern void i_to_dinode(struct inode_t*, unsigned int);
+extern void i_to_dinode(struct inode_t*);
 
 /* alloc.c */
 extern struct inode_t* ialloc(void);
