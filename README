@@ -97,8 +97,6 @@ be easier.
 
 == Description of Contents
 	
-	|-- doc
-	|
 	|-- fs
 	|   |-- balloc.c
 	|   |-- ialloc.c
@@ -108,7 +106,8 @@ be easier.
 	|   |-- sys.c
 	|   |-- sys2.c
 	|   |-- unmount.c
-	|   `-- util.c
+	|   |-- util.c
+	|   `-- fs.so
 	|
 	|-- include
 	|   |-- fs.h
@@ -116,7 +115,8 @@ be easier.
 	|   `-- test.h
 	|
 	|-- init
-	|   `-- init.c
+	|   |-- init.c
+	|   `-- init.so
 	|
 	|-- test
 	|   |-- test_util.c
@@ -128,7 +128,8 @@ be easier.
 	|   |-- test_rmdir.c
 	|   |-- test_open.c
 	|   |-- test_read.c
-	|   `-- test_write.c
+	|   |-- test_write.c
+	|   `-- volume2.vfs
 	|
 	|-- install.py
 	|
@@ -136,9 +137,43 @@ be easier.
 	|
 	|-- myvfs.py
 	|
-	|-- README
-	|
 	`-- volume1.vfs
+
+fs
+	The core part of the file system. All the source code of
+	system calls and procedures are in this folder. They are
+	linked into a dynamic link library (fs.so) which can be
+	directly called in myvfs.py.
+
+include
+	C header files of the file system (fs.h), testing framework
+	(test.h) and the constants (param.h).
+
+init
+	This file is involved with the initialization when the file
+	system is fisrt time installed to the computer. Also it
+	provides a shared library (init.so) to call it from outside.
+
+test
+	The testing framework file. The file test_utils.c defines
+	some useful procedures which can be used to watch the state
+	of vfs when debugging. The other source file is for unit test.
+	For example, test_mkdir.c tests the mkdir system call of
+	vfs. It is better than testing everything in one file.
+
+intall.py
+	A Python script for installing vfs.
+
+Makefile
+	GNU Make 3.82 or above is needed
+
+myvfs.py
+	Shell of vfs which use Python's Cmd Module.
+
+volume1.vfs
+	1MB file for the file sytem.
+
+	
 
 == Use of the Test Framework
 
@@ -155,8 +190,8 @@ be easier.
 4. Type 'file XX' to specify the executable file:
 	(gdb) file test_ls
 
-5. Now you can use any commands in gdb like:
+5. Type any commands in gdb like:
 	(gdb) b 16
 
-6. Get help from the framework like
-	watch_dinode()
+6. Use the utils provided by the framework:
+	(gdb) watch_dinode()
