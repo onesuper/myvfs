@@ -192,24 +192,29 @@ volume1.vfs
 
 If you want to test the procedure ls():
 
-1. Compile the source code:
+1.Compile the source code:
   $make 
 
-2. Compile the test framework:
+2.Compile the test framework:
   $make test_ls
 
-3. Change to the dir:
+3.Change to the dir:
   $cd test
 
-4. Use clewn 6.2 to debug test_ls.c:
+4.Use GDB to debug:
+  $gdb test_ls
+  (gdb)
+
+  Or use Clewn 6.02 + GDB to debug: (Recommanded)
   $clewn -va test_ls.c
   (gdb)
 
-5. Type 'file XX' to specify the executable file:
+  Then type 'file XX' to specify the executable file:
   (gdb) file test_ls
 
-6. Type any commands in gdb like:
+
+6.Type any commands in gdb like:
   (gdb) b 16
 
-7. Use the utils provided by the framework:
+7.Use the utils provided by the framework:
   (gdb) watch_dinode()

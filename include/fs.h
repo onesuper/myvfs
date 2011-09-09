@@ -116,7 +116,7 @@ extern FILE* fd;
 extern struct super_block_t		sb;
 extern struct inode_t			inode_hash_table[NINODE];
 extern struct open_file_t		open_file[NOFILE];
-extern unsigned short			o_file_num;
+extern unsigned short			open_file_num;
 extern struct user_t			usr;
 extern unsigned int				cur_dir_dinode_no;
 

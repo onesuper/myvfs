@@ -63,7 +63,7 @@ void mount(char* path) {
 		open_file[i].count = 0;
 		open_file[i].pinode = NULL;
 	}
-
+	open_file_num = 0;
 	return;
 }
 
