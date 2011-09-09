@@ -209,7 +209,6 @@ void touch(const char* pathname) {
  */
 void rm(const char* pathname) {
 
-
 	/* ensure present */
 	unsigned int dinode_no = namei(pathname);
 	if (dinode_no == 0) {
@@ -281,9 +280,13 @@ void rm(const char* pathname) {
 void rmdir(const char* pathname) {
 
 	/* refuse to remove the root dir */
-	if (strcmp("/", pathname))
+	if (strcmp("/", pathname) == 0)
 		return;
 	
+	/* refuse to remove the upper layer dir */
+	if (strcmp("..", pathname) == 0)
+		return;
+
 	/* ensure present */
 	unsigned int dinode_no = namei(pathname);
 	if (dinode_no == 0) {
@@ -298,6 +301,19 @@ void rmdir(const char* pathname) {
 		iput(pinode);		/* release inode */
 		return;
 	}
+	/* 
+	 * make sure it is directory and count
+	 * the files under it. if it has two or 
+	 * more files, refuse to remove it
+	 */
+	struct directory_t dir;
+	fseek(fd, pinode->addr[0] * SBLOCK, 0);
+	fread(&dir, 1, sizeof(dir), fd);
+	if (dir.size > 1) {
+		printf("Directory not empty\n");
+		iput(pinode);
+		return;
+	}
 	iput(pinode);  /* release the pinode */
 
 	/* 
@@ -306,7 +322,6 @@ void rmdir(const char* pathname) {
 	 * the nodes below it
 	 */
 	pinode = iget(cur_dir_dinode_no);
-	struct directory_t dir;
 	fseek(fd, pinode->addr[0] * SBLOCK, 0);
 	fread(&dir, 1, sizeof(dir), fd);
 	int i;

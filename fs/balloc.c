@@ -113,7 +113,7 @@ void bfree(unsigned int block_no) {
 			offset = (block_no_temp - 2) % 50;
 			fseek(fd, SBLOCK * block_no_temp, 0);
 			fread(&bmap, 1, sizeof(bmap), fd);
-			bmap.free_block_num++;
+			bmap.free_block_num ++;
 			bmap.use[offset] = 0;					/* not in use now */
 			fwrite(&bmap, 1, sizeof(bmap), fd);		/* write back */
 		}
@@ -121,7 +121,7 @@ void bfree(unsigned int block_no) {
 	
 	/* push the new free block on to stack */
 	sb.free_block_stack[sb.free_block_sp] = block_no;
-	sb.free_block_sp++;
+	sb.free_block_sp ++;
 	sb.free_block_num++;
 	sb.modified = 0;
 	save_super_block();

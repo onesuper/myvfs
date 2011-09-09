@@ -15,6 +15,7 @@ test_init: 	test/test_init
 test_mkdir:	test/test_mkdir
 test_cd: 	test/test_cd
 test_touch: test/test_touch
+test_rmdir: test/test_rmdir
 
 
 # ******************************** unit test ****************************************
@@ -46,6 +47,12 @@ test/test_touch: test/test_touch.o $(TUTIL)
 	$(CC) -o test/test_touch test/test_touch.o $(OBJECTS) $(TUTIL) $(DEBUG)
 test/test_touch.o: test/test_touch.c
 	$(CC) -o test/test_touch.o $(TFLAGS) test/test_touch.c $(DEBUG)
+
+
+test/test_rmdir: test/test_rmdir.o $(TUTIL)
+	$(CC) -o test/test_rmdir test/test_rmdir.o $(OBJECTS) $(TUTIL) $(DEBUG)
+test/test_rmdir.o: test/test_rmdir.c
+	$(CC) -o test/test_rmdir.o $(TFLAGS) test/test_rmdir.c $(DEBUG)
 
 
 $(TUTIL): test/test_util.c

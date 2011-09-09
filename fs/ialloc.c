@@ -110,7 +110,7 @@ void ifree(unsigned int dinode_no) {
 	
 	/* push the released d_inode to the free_inode_stack */
 	sb.free_inode_stack[sb.free_inode_sp] = dinode_no;
-	sb.free_inode_sp++;
-	sb.free_inode_num++;
+	sb.free_inode_sp ++;
+	sb.free_inode_num ++;
 	return;
 }
