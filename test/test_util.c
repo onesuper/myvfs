@@ -3,7 +3,8 @@
  * Author: onesuper
  * Email: onesuperclark@gmail.com
  *
- * tools for testing 
+ * the utilities provided by the test
+ * framework
  */
 
 #include <include/fs.h>

@@ -1,6 +1,3 @@
-# ========================================================
-#     Global
-# ========================================================
 VERSION = 0.1.0
 AUTHOR = onesuper
 CC = gcc
@@ -11,61 +8,51 @@ TFLAGS = -c -I. -Wall
 TUTIL = test/test_util.o
 
 
-# ========================================================
-#            ALL
-# ========================================================
+# ********** targets ****************
 all: 		init/init.so fs/fs.so
 test_ls: 	test/test_ls
 test_init: 	test/test_init
 test_mkdir:	test/test_mkdir
 test_cd: 	test/test_cd
+test_touch: test/test_touch
 
 
-# =========================================================
-#     unit test
-# =========================================================
-
-# test_init 
+# ******************************** unit test ****************************************
 test/test_init: test/test_init.o init/init.o $(TUTIL)
 	$(CC) -o test/test_init test/test_init.o init/init.o $(TUTIL) $(DEBUG)
-
 test/test_init.o: test/test_init.c
 	$(CC) -o test/test_init.o $(TFLAGS) test/test_init.c $(DEBUG)
 
 
-# test_ls 
 test/test_ls: test/test_ls.o $(TUTIL)
 	$(CC) -o test/test_ls test/test_ls.o $(OBJECTS) $(TUTIL) $(DEBUG)
-
 test/test_ls.o: test/test_ls.c
 	$(CC) -o test/test_ls.o $(TFLAGS) test/test_ls.c $(DEBUG)
 
 
-# test_mkdir
 test/test_mkdir: test/test_mkdir.o $(TUTIL)
 	$(CC) -o test/test_mkdir test/test_mkdir.o $(OBJECTS) $(TUTIL) $(DEBUG)
-
 test/test_mkdir.o: test/test_mkdir.c
 	$(CC) -o test/test_mkdir.o $(TFLAGS) test/test_mkdir.c $(DEBUG)
 
 
-# test_cd
 test/test_cd: test/test_cd.o $(TUTIL)
 	$(CC) -o test/test_cd test/test_cd.o $(OBJECTS) $(TUTIL) $(DEBUG)
-
 test/test_cd.o: test/test_cd.c
 	$(CC) -o test/test_cd.o $(TFLAGS) test/test_cd.c $(DEBUG)
 
 
-# test_util 
+test/test_touch: test/test_touch.o $(TUTIL)
+	$(CC) -o test/test_touch test/test_touch.o $(OBJECTS) $(TUTIL) $(DEBUG)
+test/test_touch.o: test/test_touch.c
+	$(CC) -o test/test_touch.o $(TFLAGS) test/test_touch.c $(DEBUG)
+
+
 $(TUTIL): test/test_util.c
 	$(CC) -o $(TUTIL) $(TFLAGS) test/test_util.c $(DEBUG)
 
 
-
-# ======================================================
-#    init.so
-# ======================================================
+# ********************* init.so *************************
 init/init.so: init/init.o
 	$(CC) -o init/init.so -shared init/init.o $(DEBUG)
 
@@ -73,16 +60,10 @@ init/init.o: init/init.c
 	$(CC) -o init/init.o $(CFLAGS) init/init.c $(DEBUG)
 
 
-# =====================================================
-#     fs.so
-# =====================================================
+# ********************* fs.so ************************
 fs/fs.so: $(OBJECTS)
 	$(CC) -o fs/fs.so -shared $(OBJECTS) $(DEBUG)
 
-
-# ======================================================
-#     OBJECTS
-# ======================================================
 fs/mount.o: fs/mount.c
 	$(CC) -o fs/mount.o $(CFLAGS) fs/mount.c $(DEBUG)
 
@@ -107,9 +88,7 @@ fs/sys.o: fs/sys.c
 fs/sys2.o: fs/sys2.c
 	$(CC) -o fs/sys2.o $(CFLAGS) fs/sys2.c $(DEBUG)
 
-# ======================================================
-#      CLEAN
-# ======================================================
+# ************** CLEAN **************
 clean:
 	rm -rf init/*.o
 	rm -rf fs/*.o

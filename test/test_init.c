@@ -3,7 +3,7 @@
  * Author: onesuper
  * Email: onesuperclark@gmail.com
  *
- * unit test for system call format_fs in init.c
+ * unit test for init.c
  */
 
 #include <include/fs.h>

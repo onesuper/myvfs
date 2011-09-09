@@ -5,22 +5,22 @@
 Myvfs is a virtual file system to show how a file system
 is implemented. In other word, how the os manage its disk.
 
-Myvfs can be seemed as a child of UNIX's file system.
-Because it uses most of UNIX's concept ,such as 'inode',
-which originally comes from the UNIX's family.
+Myvfs can be considered as a child of UNIX's file system.
+Because it uses most concepts of UNIX, such as 'inode',
+which originally came from the UNIX's world.
 
-But it is a quite simple one. The only knowledge required
-is probably C language. So you can focus on the implement-
-ation of underlying data structures in most of the time 
-and don't bother to talk to the hardware because it is not
-a real file system at all.
+But it is a simple one. The only knowledge required to 
+write it is probably C language. So one can focus on the
+implementation of underlying data structures in most of
+the time and never bother to care about the hardware bec-
+ause it is not a real file system at all.
 
-Myvfs uses a file to play as a device and communicate with 
-the real file system with fwrite() and fread() - two library
-functions of C.
+Myvfs uses a binary file to play as a device and commun-
+icate with the real file system with fwrite() and fread()
+which are two library functions of C.
 
 There are two layers: core and shell. Main data structures 
-and procedures are defined in core layer. This part is 
+and procedures are defined in the core layer. This part is 
 written in C.
 
 Shell layer calls the APIs provided by the core layer and
@@ -39,9 +39,9 @@ Python            shell
          =====================     -+
 c lib        fread  fwrite      
          ---------------------
-          Linux's file system
+            real file system
          ---------------------
-		      real device
+              real device
 
 
 With Python one can add other features easily and make the
@@ -56,7 +56,7 @@ of the Test Framework')
 
 -Is Not
 
-Myvfs is not a real file system which is often asked for
+Myvfs is not a real file system which is a synonym for
 quickness, efficiency and reliablity. On the contrary, it
 is more like a cookbook to read or a toy to play with. So
 the conciseness and readability are more important factors.

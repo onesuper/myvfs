@@ -3,7 +3,7 @@
  * Author: onesuper
  * Email: onesuperclark@gmail.com
  *
- * unit test for cd
+ * unit test for touch
  */
 
 #include <include/fs.h>
@@ -15,9 +15,7 @@
 int main() {
 	mount("volume2.vfs");
 	ls();
-	mkdir("gfw");
-	ls();
-	cd("gfw");
+	touch("ppg");
 	ls();
 	umount();
 	return 0;

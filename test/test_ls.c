@@ -3,7 +3,7 @@
  * Author: onesuper
  * Email: onesuperclark@gmail.com
  *
- * unit test for system call ls
+ * unit test for ls
  */
 
 #include <include/fs.h>

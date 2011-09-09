@@ -63,7 +63,6 @@ void format_fs(char* path, char* pwd) {
 		fseek(fd, i * SBLOCK, 0);
 		fwrite(&bmap, 1, sizeof(bmap), fd);
 	}
-	printf("create bitmaps...done\n");
 
 	/* 
 	 * initialize the on-disk inode(dinode)
@@ -81,7 +80,6 @@ void format_fs(char* path, char* pwd) {
 		fwrite(&dinode, 1, sizeof(dinode), fd);		
 		dinode.dino++;							
 	}
-	printf("create on-disk inodes...done\n");
 
 	/*
 	 * create the user(root)'s directory inode
@@ -99,7 +97,6 @@ void format_fs(char* path, char* pwd) {
 	dir.size = 0;				/* nothing in the root dir at first */
 	fseek(fd, SBLOCK * (NIBLOCK + 2 + 1), 0);
 	fwrite(&dir, 1, sizeof(dir), fd);
-	printf("create root dir...done\n");
 
 	/* since the #403 is used, adjust the bitmap in #402 */
 	fseek(fd, 402 * SBLOCK, 0);
@@ -116,7 +113,6 @@ void format_fs(char* path, char* pwd) {
 	usr.dino = 1;				/* $1 */
 	fseek(fd, 0, 0);
 	fwrite(&usr, 1, sizeof(usr), fd);
-	printf("create user information...done\n");
 
 	/* create super block at #1 */
 	struct super_block_t sb;
@@ -129,7 +125,6 @@ void format_fs(char* path, char* pwd) {
 	sb.modified = 0;
 	fseek(fd, SBLOCK * 1, 0);  
 	fwrite(&sb, 1, sizeof(sb), fd);
-	printf("create super block...done\n");
 
 	/* close the file handler and return */
 	fclose(fd);
