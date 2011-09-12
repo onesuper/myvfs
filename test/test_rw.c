@@ -31,6 +31,31 @@ int main() {
 	out = mread(fd);
 	printf(out);
 	mclose(fd);
+
+	ls();
+	touch("hello.c");
+	ls();
+
+	fd = mopen("hello.c");
+	out = mread(fd);
+	printf(out);
+	mclose(fd);
+
+	fd = mopen("hello.c");
+	mwrite(fd, "hello\nworld!\n");
+	mclose(fd);
+
+	fd = mopen("hello.c");
+	out = mread(fd);
+	mclose(fd);
+
+
+	fd = mopen("ppg");
+	out = mread(fd);
+	printf(out);
+	mclose(fd);
+
+
 	umount();
 	return 0;
 }

@@ -59,6 +59,7 @@ def vi(path = ""):
 		read_content = fs.mread(my_fd)
 		fs.mclose(my_fd)
 		
+		# use sytem's vi to edit
 		#=================================
 		# write the file to tempfile
 		fd = open("tempfile", "w")
@@ -76,7 +77,7 @@ def vi(path = ""):
 
 		# write the file to myvfs
 		my_fd = fs.mopen(path)
-		fs.mwrite(my_fd, write_content)
+		fs.mwrite(my_fd, c_char_p(write_content))
 		fs.mclose(my_fd)
 
 '''
@@ -135,6 +136,8 @@ Type "help" or "?" for more information.'''
 			fs.rm(path)
 		else:
 			path_error()
+
+
 
 	def do_vi(self, path = ""):
 		if path == "":
