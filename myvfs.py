@@ -22,6 +22,8 @@ import re
 from ctypes import *
 import getpass
 import cmd
+import subprocess
+
 '''local function for common use
 '''
 
@@ -39,6 +41,43 @@ def check_pathname(pathname):
 
 def path_error():
 	print 'Invalid directory or file name'
+
+'''
+create a subprocess of vi to edit the file
+'''
+def vi(path = ""):
+	if path == "":
+		print "The commmand is 'vi xxx'"				
+	else:
+		# read the file from myvfs
+		my_fd = fs.mopen(path)
+		if my_fd < 0:
+			return
+
+		# change the return type of
+		fs.mread.restype = c_char_p
+		read_content = fs.mread(my_fd)
+		fs.mclose(my_fd)
+		
+		#=================================
+		# write the file to tempfile
+		fd = open("tempfile", "w")
+		fd.write(read_content)
+		fd.close()
+
+		# use vi to edit the tempfile
+		subprocess.call(["vi", "tempfile"])
+
+		# read the file from the tempfile
+		fd = open("tempfile", "r")
+		write_content = fd.read()
+		fd.close()
+		#=================================
+
+		# write the file to myvfs
+		my_fd = fs.mopen(path)
+		fs.mwrite(my_fd, write_content)
+		fs.mclose(my_fd)
 
 '''
 Command-line Class
@@ -96,18 +135,18 @@ Type "help" or "?" for more information.'''
 			fs.rm(path)
 		else:
 			path_error()
+
+	def do_vi(self, path = ""):
+		if path == "":
+			vi()
+		else:
+			if check_pathname(path):
+				vi(path)
+			else:
+				path_error()
 	
-	def do_open(self, path):
-		print path
 
-	def do_close(self, path):
-		print path
 
-	def do_read(self, path):
-		print path
-
-	def do_write(self, path):
-		print path
 
 	"""document for help
 	"""
@@ -122,28 +161,19 @@ Type "help" or "?" for more information.'''
 		print "list the directories and files in the current directory"
 	
 	def help_rmdir(self):
-		print "..."
+		print "remove a directory"
 
 	def help_rm(self):
-		print "..."
+		print "remove a file"
 
 	def help_touch(self):
-		print "..."
+		print "create a file"
 
 	def help_cd(self):
-		print "..."
+		print "change to a directory"
 	
-	def help_open(self):
-		print "..."
-
-	def help_close(self):
-		print "..."
-
-	def help_read(self):
-		print "..."
-
-	def help_write(self):
-		print "..."
+	def help_vi(self):
+		print "a text editor to view and edit the file"
 
 	def help_help(self):
 		print "help yourself"

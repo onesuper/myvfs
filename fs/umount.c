@@ -6,6 +6,8 @@
  */
 
 void umount(void) {
+	/* save all the open_files's inode to the block */
+
 	fclose(fd);
 }
 

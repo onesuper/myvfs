@@ -20,17 +20,24 @@
  * return -1 when crash
  *
  */
-int open(const char* pathname) {
+int mopen(const char* pathname) {
 	
 	/* if exists */
 	unsigned int dinode_no = namei(pathname);
 	if (dinode_no == 0) {
-		printf("No such file or directory");
+		printf("No such file or directory\n");
 		return -1;
 	}
 	
 	/* get inode */
 	struct inode_t* pinode = iget(dinode_no);
+	
+	/* ensure to open a file */
+	if (pinode->type != 'f') {
+		printf("Is a directory\n");
+		iput(pinode);
+		return -1;
+	}
 
 	/* find a open_file which is not at work */
 	int i;
@@ -39,7 +46,7 @@ int open(const char* pathname) {
 			break;
 	}
 	if (i == NOFILE) {
-		printf("Cannot open any more files");
+		printf("Cannot open any more files\n");
 		return -1;
 	}
 	open_file[i].pinode = pinode;
@@ -50,15 +57,17 @@ int open(const char* pathname) {
 /*
  * close the open file
  */
-void close(int file_no) {
+void mclose(int file_no) {
 	open_file[file_no].count = 0;
+	/* iput the inode */
+	iput(open_file[file_no].pinode);
 	return;
 }
 
 /*
  * read the open file
  */
-char* read(int file_no) {
+char* mread(int file_no) {
 
 	/* check the correctness of file_no */
 	if (file_no < 0 || file_no > 99) {
@@ -95,7 +104,7 @@ char* read(int file_no) {
 /* 
  * write to a open file
  */
-void write(int file_no, const char* content) {
+void mwrite(int file_no, const char* content) {
 
 	/* check the correctness of file_no */
 	if (file_no < 0 || file_no > 99) {

@@ -17,11 +17,20 @@ int main() {
 	ls();
 	touch("ppg");
 	ls();
-	int fd = open("ppg");
-	write(fd, "good morning!");
-	char* out = read(fd);
+	int fd;
+	fd = mopen("ppg");
+	char *out = mread(fd);
 	printf(out);
-	close(fd);
+	mclose(fd);
+
+	fd = mopen("ppg");
+	mwrite(fd, "spider man!");
+	mclose(fd);
+	
+	fd = mopen("ppg");
+	out = mread(fd);
+	printf(out);
+	mclose(fd);
 	umount();
 	return 0;
 }

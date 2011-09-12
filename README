@@ -23,13 +23,14 @@ There are two layers: core and shell. Main data structures
 and procedures are defined in the core layer. This part is 
 written in C.
 
-Shell layer calls the APIs provided by the core layer and
-deal with the interactive stuffs, which is written in Python.
+Shell/util layer calls the APIs provided by the core layer
+and deal with the interactive stuffs, which is written in
+Python.
 
 The system looks like:
 
          
-Python            shell           
+Python        shell/util           
          =====================	   -+
            cd ls mkdir touch        |
  API        rmdir open rm           |

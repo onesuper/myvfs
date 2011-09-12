@@ -78,7 +78,7 @@ struct inode_t {
 	struct inode_t* forward;			/* forward inode */
 	struct inode_t* backward;			/* backward inode */
 	unsigned int	count;				/* referece count */
-	unsigned short  flag;				/* updated ?*/
+	unsigned short  flag;				/* updated */
 	/* dinode */
 	char			type;			
 	unsigned int	dino;				/* dinode no */

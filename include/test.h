@@ -15,10 +15,10 @@ extern void mkdir(const char*);
 extern void touch(const char*);
 extern void rm(const char*);
 extern void rmdir(const char*);
-extern int	open(const char*);
-extern void close(int);
-extern char* read(int);
-extern void	write(int, const char*);
+extern int	mopen(const char*);
+extern void mclose(int);
+extern char* mread(int);
+extern void	mwrite(int, const char*);
 
 /* util */
 extern void picture(void);

@@ -60,8 +60,8 @@ A shared library named 'init.so' is needed here! '''
 
 	init = cdll.LoadLibrary(os.getcwd() + '/init/init.so')
 
-	init.format_fs("volume1.vfs", password) # initialize the vfs and intall to disk
-
+	# initialize the vfs and intall to disk
+	init.format_fs("volume1.vfs", password) 
 
 	# all things done
 	print "installed successfully!"
